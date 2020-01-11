@@ -1,4 +1,9 @@
-grammar ulNoActions;
+grammar csc435;
+
+@header {
+    package om.frankc.csc435.compiler.generated;
+}
+@lexer::header {package om.frankc.csc435.compiler.generated;}
 				
 @members
 {
@@ -53,12 +58,11 @@ type:	TYPE
 
 /* Lexer */
 	 
-IF	: 'if'
+IF  : 'if'
 	;
 
-/* Fixme: add the other types here */
-TYPE	: 'int'
-	;
+TYPE    : 'int'
+        ;
 /*
  * FIXME:
  * Change this to match the specification for identifier

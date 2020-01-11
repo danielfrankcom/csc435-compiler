@@ -1,0 +1,22 @@
+plugins {
+    id 'java'
+    id 'antlr'
+}
+
+group 'om.frankc.csc435'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 11
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    antlr 'org.antlr:antlr:3.5.2'
+
+    testCompile 'junit:junit:4.12'
+    testCompile 'com.github.stefanbirkner:system-rules:1.19.0'
+
+}
