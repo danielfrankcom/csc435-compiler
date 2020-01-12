@@ -1,0 +1,7 @@
+// comment here
+int bar ()
+//comment here
+{
+    // comment here
+} //comment here
+// comment here

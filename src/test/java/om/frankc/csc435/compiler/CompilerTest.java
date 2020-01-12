@@ -31,6 +31,8 @@ public class CompilerTest {
             final String path = file.getAbsolutePath();
             final String[] arguments = {path};
 
+            System.out.printf("Testing %s\n", path);
+
             boolean success = false;
             try {
                 Compiler.main(arguments);
@@ -55,6 +57,8 @@ public class CompilerTest {
         for (File file : rejectFiles) {
             final String path = file.getAbsolutePath();
             final String[] arguments = {path};
+
+            System.out.printf("Testing %s\n", path);
 
             Throwable exception = null;
             try {

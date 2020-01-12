@@ -1,33 +1,49 @@
 grammar csc435;
 
-@header {
+@parser::header {
     package om.frankc.csc435.compiler.generated;
 }
-@lexer::header {package om.frankc.csc435.compiler.generated;}
-				
-@members
-{
-protected void mismatch (IntStream input, int ttype, BitSet follow)
-        throws RecognitionException
-{
-        throw new MismatchedTokenException(ttype, input);
+
+@lexer::header {
+    package om.frankc.csc435.compiler.generated;
 }
-public Object recoverFromMismatchedSet (IntStream input,
-                                      RecognitionException e,
-                                      BitSet follow)
-        throws RecognitionException
-{
+				
+@parser::members {
+
+    protected void mismatch (IntStream input, int ttype, BitSet follow)
+            throws RecognitionException {
+        throw new MismatchedTokenException(ttype, input);
+    }
+
+    public Object recoverFromMismatchedSet (IntStream input, RecognitionException e, BitSet follow)
+            throws RecognitionException {
         reportError(e);
         throw e;
+    }
+
+    @Override
+	public void reportError(RecognitionException e) {
+		displayRecognitionError(this.getTokenNames(), e);
+		throw new RuntimeException(e);
+	}
+
 }
+
+@lexer::members
+{
+    @Override
+    public void recover(RecognitionException ex) {
+        throw new RuntimeException(ex);
+    }
 }
 
 @rulecatch {
-        catch (RecognitionException ex) {
-                reportError(ex);
-                throw ex;
-        }
+    catch (RecognitionException ex) {
+        reportError(ex);
+        throw ex;
+    }
 }
+
 
 /*
  * This is a subset of the ulGrammar to show you how
@@ -38,46 +54,48 @@ public Object recoverFromMismatchedSet (IntStream input,
  *  - change functionBody to include variable declarations and statements 
  */
 
-program : function+ 
-	;
+program : function+ ;
 
-function: functionDecl functionBody
-	;
+function: functionDecl functionBody ;
 
-functionDecl: type identifier '(' ')'
-	;
+functionDecl: type identifier OPEN_PAREN CLOSE_PAREN ;
 
-functionBody: '{' '}'
-	;
+functionBody: OPEN_BRACE CLOSE_BRACE ;
 
-identifier : ID
-	;
+identifier : ID ;
 
-type:	TYPE
-	;
+type    : (INT | FLOAT | CHAR | STRING | BOOLEAN | VOID) ;
+
 
 /* Lexer */
-	 
-IF  : 'if'
-	;
 
-TYPE    : 'int'
-        ;
-/*
- * FIXME:
- * Change this to match the specification for identifier
- * 
- */
-ID	: ('a'..'z')+ 
-	;
+OPEN_PAREN : '(' ;
 
-/* These two lines match whitespace and comments 
- * and ignore them.
- * You want to leave these as last in the file.  
- * Add new lexical rules above 
- */
-WS      : ( '\t' | ' ' | ('\r' | '\n') )+ { $channel = HIDDEN;}
-        ;
+CLOSE_PAREN : ')' ;
 
-COMMENT : '//' ~('\r' | '\n')* ('\r' | '\n') { $channel = HIDDEN;}
-        ;
+OPEN_BRACE : '{' ;
+
+CLOSE_BRACE : '}' ;
+
+IF  : 'if' ;
+
+INT : 'int' ;
+
+FLOAT : 'float' ;
+
+CHAR : 'char' ;
+
+STRING : 'string' ;
+
+BOOLEAN : 'boolean' ;
+
+VOID : 'void' ;
+
+ID	: ('a'..'z' | 'A'..'Z' | '_')('a'..'z' | 'A'..'Z' | '0'..'9' | '_')* ;
+
+
+
+// These two lines match whitespace and comments to ignore them.
+// They should be last in the file.
+WS  : ( '\t' | ' ' | ('\r' | '\n') )+ { $channel = HIDDEN;} ;
+COMMENT : '//' ~('\r' | '\n')* ('\r' | '\n') { $channel = HIDDEN;} ;
