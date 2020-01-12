@@ -1,0 +1,11 @@
+boolean bar ()
+{
+    "";
+    "string";
+    "STRING";
+    "StRiNg";
+    "10";
+    ":";
+    "_____";
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!,.:_{} ";
+}

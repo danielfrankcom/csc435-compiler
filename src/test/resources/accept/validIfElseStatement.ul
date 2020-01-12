@@ -1,0 +1,34 @@
+int bar ()
+{
+    int id1;
+
+    if (true) {
+        id1 = "hello";
+    } else {
+        id1 = "goodbye";
+    }
+
+    if (id1) {
+        ;
+        id1 = "hello";
+    } else {
+        ;
+        ;
+    }
+
+    if
+    (
+            false
+    )
+    {
+    id1
+    =
+    "hello";
+    }
+
+    else
+
+    {       ;
+
+    }
+}

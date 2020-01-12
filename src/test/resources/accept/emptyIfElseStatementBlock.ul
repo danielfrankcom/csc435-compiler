@@ -1,0 +1,9 @@
+int bar ()
+{
+    int id1;
+
+    if (true) {
+    }
+    else {
+    }
+}

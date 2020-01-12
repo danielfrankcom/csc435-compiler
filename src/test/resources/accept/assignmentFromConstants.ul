@@ -1,0 +1,9 @@
+int bar ()
+{
+    id1 = "string constant";
+    id2 = 'c'; // char constant
+    id3 = 123; // int constant
+    id4 = 10.504; // float constant
+    id5 = true; // bool constants
+    id5 = false;
+}

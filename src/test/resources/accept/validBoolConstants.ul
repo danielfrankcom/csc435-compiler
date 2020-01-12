@@ -1,0 +1,5 @@
+boolean bar ()
+{
+    true;
+    false;
+}

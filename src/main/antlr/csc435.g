@@ -45,26 +45,51 @@ grammar csc435;
 }
 
 
-/*
- * This is a subset of the ulGrammar to show you how
- * to make new production rules.
- * You will need to:
- *  - change type to be compoundType and include appropriate productions
- *  - introduce optional formalParameters
- *  - change functionBody to include variable declarations and statements 
- */
-
 program : function+ ;
 
-function: functionDecl functionBody ;
+function    : functionDecl functionBody ;
 
-functionDecl: type identifier OPEN_PAREN CLOSE_PAREN ;
+functionDecl    : type ID OPEN_PAREN CLOSE_PAREN ;
 
-functionBody: OPEN_BRACE CLOSE_BRACE ;
+functionBody    : OPEN_BRACE varDecl* statement* CLOSE_BRACE ;
 
-identifier : ID ;
+// todo: update to be compound type
+varDecl : type ID SEMICOLON ;
 
-type    : (INT | FLOAT | CHAR | STRING | BOOLEAN | VOID) ;
+// todo: more definitions
+statement   : SEMICOLON
+            | expr SEMICOLON
+            | if_statement
+            | ID EQUALS expr
+            ;
+
+// This statement must be broken apart with epsilon due to LL(1) limitations.
+if_statement    : IF OPEN_PAREN expr CLOSE_PAREN block else_statement ;
+else_statement  : ELSE block
+                | // epsilon.
+                ;
+
+block : OPEN_BRACE statement* CLOSE_BRACE ;
+
+// todo: more definitions
+expr    : ID
+        | literal
+        ;
+
+literal : STRING_CONSTANT
+        | INT_CONSTANT
+        | FLOAT_CONSTANT
+        | CHAR_CONSTANT
+        | BOOLEAN_CONSTANT
+        ;
+
+type    : INT
+        | FLOAT
+        | CHAR
+        | STRING
+        | BOOLEAN
+        | VOID
+        ;
 
 
 /* Lexer */
@@ -77,25 +102,85 @@ OPEN_BRACE : '{' ;
 
 CLOSE_BRACE : '}' ;
 
-IF  : 'if' ;
+COMMA : ',' ;
+
+SEMICOLON : ';' ;
+
+EQUALS : '=';
+
+IF : 'if' ;
+
+ELSE : 'else' ;
 
 INT : 'int' ;
 
+INT_CONSTANT : ('0'..'9')+ ;
+
 FLOAT : 'float' ;
+
+FLOAT_CONSTANT : INT_CONSTANT '.' INT_CONSTANT ;
 
 CHAR : 'char' ;
 
+CHAR_CONSTANT   :
+                    '\''
+                    (   'a'..'z'
+                        | 'A'..'Z'
+                        | '0'..'9'
+                        | '!'
+                        | ','
+                        | '.'
+                        | ':'
+                        | '_'
+                        | '{'
+                        | '}'
+                        | ' '
+                    )
+                    '\''
+                ;
+
 STRING : 'string' ;
+
+STRING_CONSTANT :
+                    '"'
+                    (   'a'..'z'
+                        | 'A'..'Z'
+                        | '0'..'9'
+                        | '!'
+                        | ','
+                        | '.'
+                        | ':'
+                        | '_'
+                        | '{'
+                        | '}'
+                        | ' '
+                    )*
+                    '"'
+                ;
 
 BOOLEAN : 'boolean' ;
 
+BOOLEAN_CONSTANT : ('true' | 'false') ;
+
 VOID : 'void' ;
 
-ID	: ('a'..'z' | 'A'..'Z' | '_')('a'..'z' | 'A'..'Z' | '0'..'9' | '_')* ;
+ID	:
+        (
+            'a'..'z'
+            | 'A'..'Z'
+            | '_'
+        )
+        (
+            'a'..'z'
+            | 'A'..'Z'
+            | '0'..'9'
+            | '_'
+        )*
+    ;
 
 
 
 // These two lines match whitespace and comments to ignore them.
 // They should be last in the file.
-WS  : ( '\t' | ' ' | ('\r' | '\n') )+ { $channel = HIDDEN;} ;
+WS : ( '\t' | ' ' | ('\r' | '\n') )+ { $channel = HIDDEN;} ;
 COMMENT : '//' ~('\r' | '\n')* ('\r' | '\n') { $channel = HIDDEN;} ;

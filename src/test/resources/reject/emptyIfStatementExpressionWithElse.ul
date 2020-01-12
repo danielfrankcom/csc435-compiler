@@ -1,0 +1,10 @@
+int bar ()
+{
+    int id1;
+
+    if () {
+        id1 = "hello";
+    } else {
+        ;
+    }
+}
