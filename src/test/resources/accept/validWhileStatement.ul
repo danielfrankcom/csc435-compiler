@@ -1,0 +1,23 @@
+int bar ()
+{
+    int id1;
+
+    while (true) {
+        id1 = "hello";
+    }
+
+    while (id1) {
+        ;
+        id1 = "hello";
+    }
+
+    while
+    (
+            "string"
+    )
+    {
+    id1
+    =
+    "hello";
+    }
+}

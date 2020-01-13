@@ -1,0 +1,14 @@
+void bar ()
+{
+    bar(id1, id2);
+    bar (id1, 5,id3);
+    bar
+    ( id1 ) ;
+    bar
+    (
+    id1
+    ,
+    id2 ,
+    id3
+    );
+}

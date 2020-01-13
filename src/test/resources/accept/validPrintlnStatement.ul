@@ -1,0 +1,14 @@
+int bar ()
+{
+    int id1;
+
+    println "string";
+    println 'c';
+    println 8;
+    println 8.8;
+    println id1   ;
+
+    println
+    ""
+    ;
+}

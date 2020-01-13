@@ -1,0 +1,4 @@
+void bar ()
+{
+    int(id1, id2);
+}

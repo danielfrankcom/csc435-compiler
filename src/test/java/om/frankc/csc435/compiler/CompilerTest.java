@@ -11,8 +11,19 @@ public class CompilerTest {
 
     private static final ClassLoader CLASS_LOADER = CompilerTest.class.getClassLoader();
 
-    private static File[] getTestFilesForGroup(String group) {
-        final URL rootPath = CLASS_LOADER.getResource(group);
+    private enum Group {
+        accept,
+        reject
+    }
+
+    /**
+     * Get an array of {@link File} objects representing the set of files within the specified testing group
+     *
+     * @param group A {@link Group} that uniquely identifies the set of files to address.
+     * @return The generated {@link File[]}.
+     */
+    private static File[] getTestFilesForGroup(Group group) {
+        final URL rootPath = CLASS_LOADER.getResource(group.name());
         assertNotNull(rootPath);
 
         final File root = new File(rootPath.getFile());
@@ -25,7 +36,7 @@ public class CompilerTest {
 
     @Test
     public void testCompilerAccepts() {
-        final File[] acceptFiles = getTestFilesForGroup("accept");
+        final File[] acceptFiles = getTestFilesForGroup(Group.accept);
 
         for (File file : acceptFiles) {
             final String path = file.getAbsolutePath();
@@ -52,7 +63,7 @@ public class CompilerTest {
 
     @Test
     public void testCompilerRejects() {
-        final File[] rejectFiles = getTestFilesForGroup("reject");
+        final File[] rejectFiles = getTestFilesForGroup(Group.reject);
 
         for (File file : rejectFiles) {
             final String path = file.getAbsolutePath();

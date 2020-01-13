@@ -1,0 +1,4 @@
+boolean bar ()
+{
+    int[0];
+}

@@ -1,0 +1,4 @@
+int id1 ()
+{
+    print "string"
+}

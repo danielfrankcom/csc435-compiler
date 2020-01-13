@@ -1,0 +1,18 @@
+void aB ()
+{
+    boolean valid;
+    int counter;
+
+    valid = false;
+    if (valid) {
+        while (valid) {
+            counter = 0;
+        }
+        return counter;
+    } else {
+        return valid;
+    }
+
+    // A comment...
+    return "this program makes no sense";
+}

@@ -1,5 +1,10 @@
 grammar csc435;
 
+// todo: might want to disambiguate instead.
+options {
+    backtrack = true;
+}
+
 @parser::header {
     package om.frankc.csc435.compiler.generated;
 }
@@ -49,31 +54,61 @@ program : function+ ;
 
 function    : functionDecl functionBody ;
 
-functionDecl    : type ID OPEN_PAREN CLOSE_PAREN ;
+functionDecl    : type ID OPEN_PAREN formalParameters CLOSE_PAREN ;
+
+formalParameters    : compoundType ID moreFormals*
+                    | // epsilon.
+                    ;
+
+moreFormals : COMMA compoundType ID ;
 
 functionBody    : OPEN_BRACE varDecl* statement* CLOSE_BRACE ;
 
-// todo: update to be compound type
-varDecl : type ID SEMICOLON ;
+varDecl : compoundType ID SEMICOLON ;
 
-// todo: more definitions
+// todo: does this mean we can't use an expression in the brackets?
+compoundType    : type
+                | type OPEN_BRACKET INT_CONSTANT CLOSE_BRACKET
+                ;
+
+type    : INT
+        | FLOAT
+        | CHAR
+        | STRING
+        | BOOLEAN
+        | VOID
+        ;
+
 statement   : SEMICOLON
             | expr SEMICOLON
-            | if_statement
-            | ID EQUALS expr
+            | IF OPEN_PAREN expr CLOSE_PAREN block (ELSE block)?
+            | WHILE OPEN_PAREN expr CLOSE_PAREN block
+            | PRINT expr SEMICOLON
+            | PRINTLN expr SEMICOLON
+            | RETURN expr? SEMICOLON
+            | ID EQUALS expr SEMICOLON
+            | ID OPEN_BRACKET expr CLOSE_BRACKET EQUALS expr SEMICOLON
             ;
-
-// This statement must be broken apart with epsilon due to LL(1) limitations.
-if_statement    : IF OPEN_PAREN expr CLOSE_PAREN block else_statement ;
-else_statement  : ELSE block
-                | // epsilon.
-                ;
 
 block : OPEN_BRACE statement* CLOSE_BRACE ;
 
-// todo: more definitions
-expr    : ID
-        | literal
+expr : equality ;
+
+equality : lessThan (EQUAL_OP lessThan)* ;
+
+lessThan : sum (LESS_OP sum)* ;
+
+sum : sub (ADD_OP sub)* ;
+
+sub : mult (SUB_OP sub)* ;
+
+mult : atom (MULT_OP atom)* ;
+
+atom    : literal
+        | ID
+        | OPEN_PAREN expr CLOSE_PAREN
+        | ID OPEN_BRACKET expr CLOSE_BRACKET
+        | ID OPEN_PAREN exprList CLOSE_PAREN
         ;
 
 literal : STRING_CONSTANT
@@ -83,13 +118,11 @@ literal : STRING_CONSTANT
         | BOOLEAN_CONSTANT
         ;
 
-type    : INT
-        | FLOAT
-        | CHAR
-        | STRING
-        | BOOLEAN
-        | VOID
-        ;
+exprList    : expr exprMore*
+            | // epsilon.
+            ;
+
+exprMore : COMMA expr ;
 
 
 /* Lexer */
@@ -102,15 +135,37 @@ OPEN_BRACE : '{' ;
 
 CLOSE_BRACE : '}' ;
 
+OPEN_BRACKET : '[' ;
+
+CLOSE_BRACKET : ']' ;
+
 COMMA : ',' ;
 
 SEMICOLON : ';' ;
 
-EQUALS : '=';
+EQUALS : '=' ;
+
+MULT_OP : '*' ;
+
+ADD_OP : '+' ;
+
+SUB_OP : '-' ;
+
+LESS_OP : '<' ;
+
+EQUAL_OP : '==' ;
 
 IF : 'if' ;
 
 ELSE : 'else' ;
+
+WHILE : 'while' ;
+
+PRINT : 'print' ;
+
+PRINTLN : 'println' ;
+
+RETURN : 'return' ;
 
 INT : 'int' ;
 
@@ -141,6 +196,7 @@ CHAR_CONSTANT   :
 
 STRING : 'string' ;
 
+// todo: is an empty string valid?
 STRING_CONSTANT :
                     '"'
                     (   'a'..'z'

@@ -1,0 +1,13 @@
+int bar ()
+{
+    int id1;
+
+    id[0];
+    id1 [ 0 ] ;
+
+    id1 [ id2 [ id3 [ 5 ] ] ] ;
+
+    id3 = id1 [ "string" ] ;
+
+    if (id[0]) {}
+}

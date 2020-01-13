@@ -1,0 +1,11 @@
+int bar ()
+{
+    int[0] id1;
+    float[00] id2;
+    char        [ 100 ]  id3    ;
+    string[10] id4;
+    boolean[5] id5;
+    void [0] id6;
+
+    ;
+}

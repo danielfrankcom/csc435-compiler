@@ -1,0 +1,46 @@
+void bar ()
+{
+    return;
+}
+
+void bar ()
+{
+
+return   ;
+}
+
+void bar ()
+{
+    return "string";
+}
+
+void bar ()
+{
+    return 'c';
+}
+
+void bar ()
+{
+    return true;
+}
+
+void bar ()
+{
+    return false;
+}
+
+void bar ()
+{
+    return 10;
+}
+
+void bar ()
+{
+    return 10.10;
+}
+
+void bar ()
+{
+    int id1;
+    return id1;
+}

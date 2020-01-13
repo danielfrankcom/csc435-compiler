@@ -1,0 +1,8 @@
+int bar ()
+{
+    int id1;
+
+    while (true;) {
+        id1 = "hello";
+    }
+}

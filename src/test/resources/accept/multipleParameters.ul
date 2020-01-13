@@ -1,0 +1,11 @@
+int id1 (int p1, string p2) {
+}
+
+int id2 (int[5] p1)
+{
+}
+
+int id3 (boolean p1,float[0] p2,void p3,char p4) { }
+
+int id4 () {
+}

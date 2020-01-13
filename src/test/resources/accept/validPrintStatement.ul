@@ -1,0 +1,14 @@
+int bar ()
+{
+    int id1;
+
+    print "string";
+    print 'c';
+    print 8;
+    print 8.8;
+    print id1   ;
+
+    print
+    ""
+    ;
+}

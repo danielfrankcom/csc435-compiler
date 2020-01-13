@@ -1,0 +1,17 @@
+int bar ()
+{
+    int id1;
+
+    id1 [ id1 ] = id1 ;
+    id1 [ 0 ] = 0;
+
+id [ "string" ] = true;
+
+    id
+    [
+    12.34
+    ]
+    =
+    "a string"
+    ;
+}
