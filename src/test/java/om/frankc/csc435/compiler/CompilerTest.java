@@ -35,6 +35,28 @@ public class CompilerTest {
     }
 
     @Test
+    public void tempTest() {
+        final URL rootPath = CLASS_LOADER.getResource("accept/allCharTypesValidId.ul");
+        final String path = new File(rootPath.getFile()).getAbsolutePath();
+        final String[] arguments = {path};
+
+        boolean success = false;
+        try {
+            Compiler.main(arguments);
+
+            // The above line will not throw an exception if successful,
+            // but will also not return a result. We double check that
+            // we get past that line for the sake of the unit test.
+            success = true;
+
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+
+        assertTrue(success);
+    }
+
+    @Test
     public void testCompilerAccepts() {
         final File[] acceptFiles = getTestFilesForGroup(Group.accept);
 

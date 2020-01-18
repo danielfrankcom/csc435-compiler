@@ -1,12 +1,17 @@
-grammar csc435;
+grammar Csc435;
 
-// todo: might want to disambiguate instead.
 options {
     backtrack = true;
+    language = Java;
 }
 
 @parser::header {
     package om.frankc.csc435.compiler.generated;
+    
+    import om.frankc.csc435.compiler.ast.*;
+
+    import java.util.HashSet;
+    import java.util.Set;
 }
 
 @lexer::header {
@@ -34,8 +39,7 @@ options {
 
 }
 
-@lexer::members
-{
+@lexer::members {
     @Override
     public void recover(RecognitionException ex) {
         throw new RuntimeException(ex);
@@ -50,9 +54,28 @@ options {
 }
 
 
-program : function+ ;
+program returns [Program program]
+    @init {
+        final Set<Function> functions = new HashSet<>();
+    }
+:   (f = function
+        {
+            final boolean success = functions.add(f);
 
-function    : functionDecl functionBody ;
+            // Failure indicates a duplicate function.
+            assert success;
+        }
+    )+
+    EOF
+{
+    program = new Program(functions);
+};
+
+function returns [Function function]
+: functionDecl functionBody
+{
+    return new Function();
+};
 
 functionDecl    : type ID OPEN_PAREN formalParameters CLOSE_PAREN ;
 
@@ -66,7 +89,6 @@ functionBody    : OPEN_BRACE varDecl* statement* CLOSE_BRACE ;
 
 varDecl : compoundType ID SEMICOLON ;
 
-// todo: does this mean we can't use an expression in the brackets?
 compoundType    : type
                 | type OPEN_BRACKET INT_CONSTANT CLOSE_BRACKET
                 ;
@@ -196,7 +218,6 @@ CHAR_CONSTANT   :
 
 STRING : 'string' ;
 
-// todo: is an empty string valid?
 STRING_CONSTANT :
                     '"'
                     (   'a'..'z'
