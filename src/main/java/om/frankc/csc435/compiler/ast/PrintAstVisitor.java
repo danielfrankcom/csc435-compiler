@@ -1,5 +1,7 @@
 package om.frankc.csc435.compiler.ast;
 
+import java.util.Iterator;
+
 public class PrintAstVisitor implements IAstVisitor {
 
     @Override
@@ -15,6 +17,7 @@ public class PrintAstVisitor implements IAstVisitor {
     @Override
     public void visit(Function function) {
         function.getDeclaration().accept(this);
+        System.out.print(' ');
         //function.getBody().accept(this);
     }
 
@@ -24,7 +27,7 @@ public class PrintAstVisitor implements IAstVisitor {
         System.out.print(' ');
         declaration.getId().accept(this);
         System.out.print(' ');
-        //declaration.getParamList().accept(this);
+        declaration.getParamList().accept(this);
     }
 
     @Override
@@ -52,7 +55,26 @@ public class PrintAstVisitor implements IAstVisitor {
 
     @Override
     public void visit(FormalParameterList paramList) {
+        System.out.print('(');
 
+        final Iterator<FormalParameter> params = paramList.getParameters().iterator();
+        while (params.hasNext()) {
+            final FormalParameter current = params.next();
+            current.accept(this);
+
+            if (params.hasNext()) {
+                System.out.print(", ");
+            }
+        }
+
+        System.out.print(')');
+    }
+
+    @Override
+    public void visit(FormalParameter parameter) {
+        parameter.getTypeNode().accept(this);
+        System.out.print(' ');
+        parameter.getId().accept(this);
     }
 
     @Override

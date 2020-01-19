@@ -18,6 +18,8 @@ public interface IAstVisitor {
 
     void visit(FormalParameterList paramList);
 
+    void visit(FormalParameter parameter);
+
     void visit(FunctionBody body);
 
 }

@@ -36,7 +36,7 @@ public class CompilerTest {
 
     @Test
     public void tempTest() {
-        final URL rootPath = CLASS_LOADER.getResource("accept/allCharTypesValidId.ul");
+        final URL rootPath = CLASS_LOADER.getResource("accept/multipleParameters.ul");
         final String path = new File(rootPath.getFile()).getAbsolutePath();
         final String[] arguments = {path};
 

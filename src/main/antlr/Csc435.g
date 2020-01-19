@@ -10,8 +10,11 @@ options {
 
     import om.frankc.csc435.compiler.ast.*;
 
-    import java.util.List;
-    import java.util.LinkedList;
+	import java.util.*;
+
+    // This must be manually imported as it conflicts
+    // with the java.util.BitSet class.
+	import org.antlr.runtime.BitSet;
 }
 
 @lexer::header {
@@ -84,13 +87,36 @@ functionDecl returns [FunctionDeclaration declaration]
 };
 
 formalParameters returns [FormalParameterList paramList]
-: compoundType ID moreFormals*
-    | // epsilon.
+: t=compoundType i=id params=moreFormals
 {
-    // todo
+    final FormalParameter firstParam = new FormalParameter(t, i);
+    params.add(0, firstParam);
+    return new FormalParameterList(params);
+}
+| // epsilon.
+{
+    final List<FormalParameter> parameters = Collections.emptyList();
+    return new FormalParameterList(parameters);
 };
 
-moreFormals : COMMA compoundType ID ;
+moreFormals returns [List<FormalParameter> parameters]
+    @init {
+        parameters = new LinkedList<>();
+    }
+:   (COMMA param=formalParameter
+        {
+            parameters.add(param);
+        }
+    )*
+{
+    return parameters;
+};
+
+formalParameter returns [FormalParameter parameter]
+: t=compoundType i=id
+{
+    return new FormalParameter(t, i);
+};
 
 functionBody returns [FunctionBody body]
 : OPEN_BRACE varDecl* statement* CLOSE_BRACE

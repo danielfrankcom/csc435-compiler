@@ -7,7 +7,7 @@ public class FunctionDeclaration extends AstNode {
     public FunctionDeclaration(TypeNode typeNode, Identifier id, FormalParameterList paramList) {
         assert id != null;
         assert typeNode != null;
-        // todo: assert paramList != null;
+        assert paramList != null;
 
         mTypeNode = typeNode;
         mId = id;
