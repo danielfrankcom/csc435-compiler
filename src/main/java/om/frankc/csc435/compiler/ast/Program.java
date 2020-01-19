@@ -10,17 +10,15 @@ import java.util.Objects;
  */
 public class Program extends AstNode {
 
-    public Program(List<Function> functions) {
+    public Program(FunctionList functions) {
         assert functions != null;
-        assert functions.size() > 0;
-
         mFunctions = functions;
     }
 
-    private final List<Function> mFunctions;
+    private final FunctionList mFunctions;
 
-    public ImmutableList<Function> getFunctions() {
-        return ImmutableList.copyOf(mFunctions);
+    public FunctionList getFunctions() {
+        return mFunctions;
     }
 
     @Override

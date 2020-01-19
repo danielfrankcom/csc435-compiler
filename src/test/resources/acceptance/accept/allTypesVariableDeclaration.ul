@@ -15,8 +15,10 @@ char id3  ;
      ;
 
          void
-         id
+         id6
          ;
+
+     string[5] id7;
 
 
 }

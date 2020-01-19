@@ -4,6 +4,8 @@ public interface IAstVisitor {
 
     void visit(Program program);
 
+    void visit(FunctionList functions);
+
     void visit(Function function);
 
     void visit(FunctionDeclaration declaration);
@@ -21,5 +23,17 @@ public interface IAstVisitor {
     void visit(FormalParameter parameter);
 
     void visit(FunctionBody body);
+
+    void visit(VariableDeclarationList declarations);
+
+    void visit(VariableDeclaration declaration);
+
+    void visit(StatementList statements);
+
+    void visit(ExpressionStatement statement);
+
+    void visit(WhileStatement statement);
+
+    void visit(Block block);
 
 }

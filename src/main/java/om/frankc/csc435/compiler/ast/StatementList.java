@@ -2,10 +2,10 @@ package om.frankc.csc435.compiler.ast;
 
 import java.util.List;
 
-public class FormalParameterList extends NodeList<FormalParameter> {
+public class StatementList extends NodeList<Statement> {
 
-    public FormalParameterList(List<FormalParameter> parameters) {
-        super(parameters);
+    public StatementList(List<Statement> statements) {
+        super(statements);
     }
 
     @Override

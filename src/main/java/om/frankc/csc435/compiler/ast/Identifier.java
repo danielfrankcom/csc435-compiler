@@ -2,7 +2,7 @@ package om.frankc.csc435.compiler.ast;
 
 import java.util.Objects;
 
-public class Identifier extends AstNode {
+public class Identifier extends Expression {
 
     public Identifier(String text) {
         assert text != null;

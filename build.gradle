@@ -19,5 +19,6 @@ dependencies {
     compile 'com.google.guava:guava:28.2-jre'
 
     testCompile 'junit:junit:4.12'
+    testCompile 'commons-io:commons-io:2.6'
 
 }

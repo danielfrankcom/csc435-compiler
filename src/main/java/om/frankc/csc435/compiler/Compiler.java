@@ -2,22 +2,31 @@
 package om.frankc.csc435.compiler;
 
 import om.frankc.csc435.compiler.ast.IAstVisitor;
-import om.frankc.csc435.compiler.ast.PrintAstVisitor;
+import om.frankc.csc435.compiler.ast.PrettyPrintAstVisitor;
 import om.frankc.csc435.compiler.ast.Program;
 import om.frankc.csc435.compiler.generated.Csc435Lexer;
 import om.frankc.csc435.compiler.generated.Csc435Parser;
 import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CommonTokenStream;
 
-import java.io.FileInputStream;
+import java.io.*;
+import java.util.function.Consumer;
 
 public class Compiler {
 
     public static void main(String[] args) throws Exception {
 
-        if (args.length == 0) {
-            System.out.println("Usage: Compiler filename.ul");
+        if (args.length != 1 && args.length != 3) {
+            System.out.println("Usage: Compiler filename.ul [-p output/prettyPrintFile.ul]");
             throw new IllegalArgumentException();
+        }
+
+        final File prettyPrintOutput;
+        if (args.length > 1) {
+            assert "-p".equals(args[1]);
+            prettyPrintOutput = new File(args[2]);
+        } else {
+            prettyPrintOutput = null;
         }
 
         final ANTLRInputStream input = new ANTLRInputStream(new FileInputStream(args[0]));
@@ -31,8 +40,24 @@ public class Compiler {
         // This may throw an exception however
         // we want to fail fast so we let it go.
         final Program program = parser.program();
-        final IAstVisitor visitor = new PrintAstVisitor();
-        program.accept(visitor);
+
+        // Optional pretty-print functionality.
+        if (prettyPrintOutput != null) {
+            final BufferedWriter writer = new BufferedWriter(new FileWriter(prettyPrintOutput));
+            final Consumer<String> output = (string) -> {
+                try {
+                    writer.write(string);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            };
+
+            final IAstVisitor visitor = new PrettyPrintAstVisitor(output);
+            program.accept(visitor);
+
+            writer.flush();
+            writer.close();
+        }
     }
 
 }

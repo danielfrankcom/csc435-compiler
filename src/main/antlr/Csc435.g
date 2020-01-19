@@ -58,20 +58,22 @@ options {
 
 
 program returns [Program program]
+: f=functions EOF
+{
+    program = new Program(f);
+};
+
+functions returns [FunctionList fns]
     @init {
         final List<Function> functions = new LinkedList<>();
     }
 :   (f=function
         {
-            final boolean success = functions.add(f);
-
-            // Failure indicates a duplicate function.
-            assert success;
+            functions.add(f);
         }
     )+
-    EOF
 {
-    program = new Program(functions);
+    return new FunctionList(functions);
 };
 
 function returns [Function function]
@@ -119,13 +121,41 @@ formalParameter returns [FormalParameter parameter]
 };
 
 functionBody returns [FunctionBody body]
-: OPEN_BRACE varDecl* statement* CLOSE_BRACE
+: OPEN_BRACE decls=varDecls stmts=statements CLOSE_BRACE
 {
-    // todo
-    return new FunctionBody();
+    return new FunctionBody(decls, stmts);
 };
 
-varDecl : compoundType ID SEMICOLON ;
+varDecls returns [VariableDeclarationList declList]
+    @init {
+        final List<VariableDeclaration> declarations = new LinkedList<>();
+    }
+:   (declaration=varDecl
+        {
+            declarations.add(declaration);
+        }
+    )*
+{
+    return new VariableDeclarationList(declarations);
+};
+
+// todo: check for nulls
+statements returns [StatementList stmts]
+    @init {
+        final List<Statement> statements = new LinkedList<>();
+    }
+:   (s=statement
+        {
+            // Some statements such as a lone semicolon
+            // are not worthy of being added to the tree.
+            if (s != null) {
+                statements.add(s);
+            }
+        }
+    )*
+{
+    return new StatementList(statements);
+};
 
 compoundType returns [TypeNode type]
 : t=type
@@ -163,20 +193,54 @@ type returns [Type type]
     return Type.VOID;
 };
 
-statement   : SEMICOLON
-            | expr SEMICOLON
-            | IF OPEN_PAREN expr CLOSE_PAREN block (ELSE block)?
-            | WHILE OPEN_PAREN expr CLOSE_PAREN block
-            | PRINT expr SEMICOLON
-            | PRINTLN expr SEMICOLON
-            | RETURN expr? SEMICOLON
-            | ID EQUALS expr SEMICOLON
-            | ID OPEN_BRACKET expr CLOSE_BRACKET EQUALS expr SEMICOLON
-            ;
+varDecl returns [VariableDeclaration declaration]
+: t=compoundType i=id SEMICOLON
+{
+    return new VariableDeclaration(t, i);
+};
 
-block : OPEN_BRACE statement* CLOSE_BRACE ;
+statement returns [Statement statement]
+: SEMICOLON // ignore.
+| e=exprStatement
+{
+    statement = e;
+}
+| IF OPEN_PAREN expr CLOSE_PAREN block (ELSE block)?
+| w=whileStatement
+{
+    statement = w;
+}
+| PRINT expr SEMICOLON
+| PRINTLN expr SEMICOLON
+| RETURN expr? SEMICOLON
+| ID EQUALS expr SEMICOLON
+| ID OPEN_BRACKET expr CLOSE_BRACKET EQUALS expr SEMICOLON
+;
 
-expr : equality ;
+exprStatement returns [ExpressionStatement statement]
+: e=expr SEMICOLON
+{
+    return new ExpressionStatement(e);
+};
+
+// todo: if statement
+
+whileStatement returns [WhileStatement statement]
+: WHILE OPEN_PAREN e=expr CLOSE_PAREN b=block
+{
+    return new WhileStatement(e, b);
+};
+
+// todo
+block returns [Block block]
+: OPEN_BRACE s=statements CLOSE_BRACE
+{
+    return new Block(s);
+};
+
+// todo
+expr returns [Expression expression]
+: equality ;
 
 equality : lessThan (EQUAL_OP lessThan)* ;
 
@@ -189,7 +253,7 @@ sub : mult (SUB_OP sub)* ;
 mult : atom (MULT_OP atom)* ;
 
 atom    : literal
-        | ID
+        | id
         | OPEN_PAREN expr CLOSE_PAREN
         | ID OPEN_BRACKET expr CLOSE_BRACKET
         | ID OPEN_PAREN exprList CLOSE_PAREN

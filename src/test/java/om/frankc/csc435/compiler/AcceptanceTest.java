@@ -4,12 +4,15 @@ import org.junit.Test;
 
 import java.io.File;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.junit.Assert.*;
 
-public class CompilerTest {
+public class AcceptanceTest {
 
-    private static final ClassLoader CLASS_LOADER = CompilerTest.class.getClassLoader();
+    private static final ClassLoader CLASS_LOADER = AcceptanceTest.class.getClassLoader();
+    private static final String TEST_FOLDER = "acceptance";
 
     private enum Group {
         accept,
@@ -23,7 +26,9 @@ public class CompilerTest {
      * @return The generated {@link File[]}.
      */
     private static File[] getTestFilesForGroup(Group group) {
-        final URL rootPath = CLASS_LOADER.getResource(group.name());
+        final Path combinedPath = Paths.get(TEST_FOLDER, group.name());
+        final String relativePath = combinedPath.toFile().getPath();
+        final URL rootPath = CLASS_LOADER.getResource(relativePath);
         assertNotNull(rootPath);
 
         final File root = new File(rootPath.getFile());
@@ -32,28 +37,6 @@ public class CompilerTest {
         assertNotEquals(0, children.length);
 
         return children;
-    }
-
-    @Test
-    public void tempTest() {
-        final URL rootPath = CLASS_LOADER.getResource("accept/multipleParameters.ul");
-        final String path = new File(rootPath.getFile()).getAbsolutePath();
-        final String[] arguments = {path};
-
-        boolean success = false;
-        try {
-            Compiler.main(arguments);
-
-            // The above line will not throw an exception if successful,
-            // but will also not return a result. We double check that
-            // we get past that line for the sake of the unit test.
-            success = true;
-
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
-
-        assertTrue(success);
     }
 
     @Test
