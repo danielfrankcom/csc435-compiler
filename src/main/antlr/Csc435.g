@@ -77,7 +77,7 @@ function returns [Function function]
     return new Function();
 };
 
-functionDecl    : type ID OPEN_PAREN formalParameters CLOSE_PAREN ;
+functionDecl    : compoundType ID OPEN_PAREN formalParameters CLOSE_PAREN ;
 
 formalParameters    : compoundType ID moreFormals*
                     | // epsilon.
