@@ -7,11 +7,11 @@ options {
 
 @parser::header {
     package om.frankc.csc435.compiler.generated;
-    
+
     import om.frankc.csc435.compiler.ast.*;
 
-    import java.util.HashSet;
-    import java.util.Set;
+    import java.util.List;
+    import java.util.LinkedList;
 }
 
 @lexer::header {
@@ -56,9 +56,9 @@ options {
 
 program returns [Program program]
     @init {
-        final Set<Function> functions = new HashSet<>();
+        final List<Function> functions = new LinkedList<>();
     }
-:   (f = function
+:   (f=function
         {
             final boolean success = functions.add(f);
 
@@ -72,34 +72,70 @@ program returns [Program program]
 };
 
 function returns [Function function]
-: functionDecl functionBody
+: declaration=functionDecl body=functionBody
 {
-    return new Function();
+    return new Function(declaration, body);
 };
 
-functionDecl    : compoundType ID OPEN_PAREN formalParameters CLOSE_PAREN ;
+functionDecl returns [FunctionDeclaration declaration]
+: t=compoundType i=id OPEN_PAREN params=formalParameters CLOSE_PAREN
+{
+    return new FunctionDeclaration(t, i, params);
+};
 
-formalParameters    : compoundType ID moreFormals*
-                    | // epsilon.
-                    ;
+formalParameters returns [FormalParameterList paramList]
+: compoundType ID moreFormals*
+    | // epsilon.
+{
+    // todo
+};
 
 moreFormals : COMMA compoundType ID ;
 
-functionBody    : OPEN_BRACE varDecl* statement* CLOSE_BRACE ;
+functionBody returns [FunctionBody body]
+: OPEN_BRACE varDecl* statement* CLOSE_BRACE
+{
+    // todo
+    return new FunctionBody();
+};
 
 varDecl : compoundType ID SEMICOLON ;
 
-compoundType    : type
-                | type OPEN_BRACKET INT_CONSTANT CLOSE_BRACKET
-                ;
+compoundType returns [TypeNode type]
+: t=type
+{
+    type = t;
+}
+| t=type OPEN_BRACKET constant=intLiteral CLOSE_BRACKET
+{
+    type = new ArrayType(t, constant);
+};
 
-type    : INT
-        | FLOAT
-        | CHAR
-        | STRING
-        | BOOLEAN
-        | VOID
-        ;
+type returns [Type type]
+: INT
+{
+    return Type.INT;
+}
+| FLOAT
+{
+    return Type.FLOAT;
+}
+| CHAR
+{
+    return Type.CHAR;
+}
+| STRING
+{
+    return Type.STRING;
+}
+| BOOLEAN
+{
+    return Type.BOOLEAN;
+}
+| VOID
+{
+    return Type.VOID;
+};
 
 statement   : SEMICOLON
             | expr SEMICOLON
@@ -134,11 +170,25 @@ atom    : literal
         ;
 
 literal : STRING_CONSTANT
-        | INT_CONSTANT
+        | intLiteral
         | FLOAT_CONSTANT
         | CHAR_CONSTANT
         | BOOLEAN_CONSTANT
         ;
+
+intLiteral returns [IntegerLiteral literal]
+: constant=INT_CONSTANT
+{
+    final int value = Integer.parseInt(constant.getText());
+    literal = new IntegerLiteral(value);
+};
+
+id returns [Identifier id]
+: i=ID
+{
+    final String text = i.getText();
+    id = new Identifier(text);
+};
 
 exprList    : expr exprMore*
             | // epsilon.

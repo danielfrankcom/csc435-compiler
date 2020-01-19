@@ -1,6 +1,8 @@
 
 package om.frankc.csc435.compiler;
 
+import om.frankc.csc435.compiler.ast.IAstVisitor;
+import om.frankc.csc435.compiler.ast.PrintAstVisitor;
 import om.frankc.csc435.compiler.ast.Program;
 import om.frankc.csc435.compiler.generated.Csc435Lexer;
 import om.frankc.csc435.compiler.generated.Csc435Parser;
@@ -29,6 +31,8 @@ public class Compiler {
         // This may throw an exception however
         // we want to fail fast so we let it go.
         final Program program = parser.program();
+        final IAstVisitor visitor = new PrintAstVisitor();
+        program.accept(visitor);
     }
 
 }

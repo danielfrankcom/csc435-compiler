@@ -16,7 +16,8 @@ dependencies {
 
     antlr 'org.antlr:antlr:3.5.2'
 
+    compile 'com.google.guava:guava:28.2-jre'
+
     testCompile 'junit:junit:4.12'
-    testCompile 'com.github.stefanbirkner:system-rules:1.19.0'
 
 }

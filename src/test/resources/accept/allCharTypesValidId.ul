@@ -6,10 +6,16 @@ void cD_ ()
 {
 }
 
+void cD_ ()
+{
+}
+
 float _EfGh_IJK_lm ()
 {
 }
 
-float _0E1fGh_2IJK_lm3 ()
-{
+float _0E1fGh_2IJK_lm3 () {
+}
+
+string[6] _0E1fGh_2IJK_lm3 () {
 }
