@@ -60,7 +60,7 @@ options {
 program returns [Program program]
 : f=functions EOF
 {
-    program = new Program(f);
+    return new Program(f);
 };
 
 functions returns [FunctionList fns]
@@ -139,7 +139,6 @@ varDecls returns [VariableDeclarationList declList]
     return new VariableDeclarationList(declarations);
 };
 
-// todo: check for nulls
 statements returns [StatementList stmts]
     @init {
         final List<Statement> statements = new LinkedList<>();
@@ -160,11 +159,11 @@ statements returns [StatementList stmts]
 compoundType returns [TypeNode type]
 : t=type
 {
-    type = t;
+    return t;
 }
 | t=type OPEN_BRACKET constant=intLiteral CLOSE_BRACKET
 {
-    type = new ArrayType(t, constant);
+    return new ArrayType(t, constant);
 };
 
 type returns [Type type]
@@ -203,12 +202,12 @@ statement returns [Statement statement]
 : SEMICOLON // ignore.
 | e=exprStatement
 {
-    statement = e;
+    return e;
 }
 | IF OPEN_PAREN expr CLOSE_PAREN block (ELSE block)?
 | w=whileStatement
 {
-    statement = w;
+    return w;
 }
 | PRINT expr SEMICOLON
 | PRINTLN expr SEMICOLON
@@ -231,53 +230,127 @@ whileStatement returns [WhileStatement statement]
     return new WhileStatement(e, b);
 };
 
-// todo
 block returns [Block block]
 : OPEN_BRACE s=statements CLOSE_BRACE
 {
     return new Block(s);
 };
 
-// todo
 expr returns [Expression expression]
-: equality ;
+: e=equality
+{
+    return e;
+};
 
-equality : lessThan (EQUAL_OP lessThan)* ;
+// todo
+equality returns [Expression expression]
+: e=lessThan (EQUAL_OP lessThan)*
+{
+    return e;
+};
 
-lessThan : sum (LESS_OP sum)* ;
+lessThan returns [Expression expression]
+: e=sum (LESS_OP sum)*
+{
+    return e;
+};
 
-sum : sub (ADD_OP sub)* ;
+sum returns [Expression expression]
+: e=sub (ADD_OP sub)*
+{
+    return e;
+};
 
-sub : mult (SUB_OP sub)* ;
+sub returns [Expression expression]
+: e=mult (SUB_OP sub)*
+{
+    return e;
+};
 
-mult : atom (MULT_OP atom)* ;
+mult returns [Expression expression]
+: e=atom (MULT_OP atom)*
+{
+    return e;
+};
 
-atom    : literal
-        | id
-        | OPEN_PAREN expr CLOSE_PAREN
-        | ID OPEN_BRACKET expr CLOSE_BRACKET
-        | ID OPEN_PAREN exprList CLOSE_PAREN
-        ;
+atom returns [Expression expression]
+: l=literal
+{
+    return l;
+}
+| i=id
+{
+    return i;
+}
+| OPEN_PAREN expr CLOSE_PAREN
+| ID OPEN_BRACKET expr CLOSE_BRACKET
+| ID OPEN_PAREN exprList CLOSE_PAREN
+;
 
-literal : STRING_CONSTANT
-        | intLiteral
-        | FLOAT_CONSTANT
-        | CHAR_CONSTANT
-        | BOOLEAN_CONSTANT
-        ;
+literal returns [Literal literal]
+: s=stringLiteral
+{
+    return s;
+}
+| i=intLiteral
+{
+    return i;
+}
+| f=floatLiteral
+{
+    return f;
+}
+| c=charLiteral
+{
+    return c;
+}
+| b=booleanLiteral
+{
+    return b;
+};
+
+stringLiteral returns [StringLiteral literal]
+: constant=STRING_CONSTANT
+{
+    final String value = constant.getText();
+    return new StringLiteral(value);
+};
 
 intLiteral returns [IntegerLiteral literal]
 : constant=INT_CONSTANT
 {
     final int value = Integer.parseInt(constant.getText());
-    literal = new IntegerLiteral(value);
+    return new IntegerLiteral(value);
+};
+
+floatLiteral returns [FloatLiteral literal]
+: constant=FLOAT_CONSTANT
+{
+    final float value = Float.parseFloat(constant.getText());
+    return new FloatLiteral(value);
+};
+
+charLiteral returns [CharacterLiteral literal]
+: constant=CHAR_CONSTANT
+{
+    final String text = constant.getText();
+    assert text.length() == 3; // Account for quotes.
+    final char value = text.charAt(1);
+    return new CharacterLiteral(value);
+};
+
+booleanLiteral returns [BooleanLiteral literal]
+: constant=BOOLEAN_CONSTANT
+{
+    final boolean value = Boolean.parseBoolean(constant.getText());
+    return new BooleanLiteral(value);
 };
 
 id returns [Identifier id]
 : i=ID
 {
     final String text = i.getText();
-    id = new Identifier(text);
+    return new Identifier(text);
 };
 
 exprList    : expr exprMore*

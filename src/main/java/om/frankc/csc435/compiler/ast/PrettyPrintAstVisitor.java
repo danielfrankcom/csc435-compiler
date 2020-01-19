@@ -22,12 +22,20 @@ public class PrettyPrintAstVisitor implements IAstVisitor {
         mCurrentLine.append(string);
     }
 
+    private void print(int integer) {
+        print(Integer.toString(integer));
+    }
+
+    private void print(float floatingPoint) {
+        print(Float.toString(floatingPoint));
+    }
+
     private void print(char character) {
         print(Character.toString(character));
     }
 
-    private void print(int integer) {
-        print(Integer.toString(integer));
+    private void print(boolean bool) {
+        print(Boolean.toString(bool));
     }
 
     private void println(String string) {
@@ -116,6 +124,28 @@ public class PrettyPrintAstVisitor implements IAstVisitor {
     }
 
     @Override
+    public void visit(StringLiteral literal) {
+        print(literal.getValue());
+    }
+
+    @Override
+    public void visit(FloatLiteral literal) {
+        print(literal.getValue());
+    }
+
+    @Override
+    public void visit(CharacterLiteral literal) {
+        print('\'');
+        print(literal.getValue());
+        print('\'');
+    }
+
+    @Override
+    public void visit(BooleanLiteral literal) {
+        print(literal.getValue());
+    }
+
+    @Override
     public void visit(FormalParameterList paramList) {
         print('(');
 
@@ -168,21 +198,37 @@ public class PrettyPrintAstVisitor implements IAstVisitor {
 
     @Override
     public void visit(StatementList statements) {
-
+        for (Statement current : statements.getElements()) {
+            current.accept(this);
+            println();
+        }
     }
 
     @Override
     public void visit(ExpressionStatement statement) {
-
+        statement.getExpression().accept(this);
+        print(';');
     }
 
     @Override
     public void visit(WhileStatement statement) {
-
+        print("while (");
+        statement.getExpression().accept(this);
+        println(')');
+        statement.getBlock().accept(this);
     }
 
     @Override
     public void visit(Block block) {
+        println('{');
+        mIndentationLevel++;
+        block.getStatements().accept(this);
+        mIndentationLevel--;
+        print('}');
+    }
+
+    @Override
+    public void visit(ExpressionList expressionList) {
 
     }
 

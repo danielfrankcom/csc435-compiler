@@ -1,0 +1,24 @@
+int aB()
+{
+    while(7) {
+        ;
+    }
+
+    while("string") {
+        5;
+        "string";
+    }
+    while(0.58) {
+    }
+    while ('c')
+    {
+    }
+    while (true)
+    {
+        ;
+        true;
+    }
+    while (false)
+    {
+    }
+}

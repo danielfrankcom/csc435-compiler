@@ -18,6 +18,14 @@ public interface IAstVisitor {
 
     void visit(IntegerLiteral literal);
 
+    void visit(StringLiteral literal);
+
+    void visit(FloatLiteral literal);
+
+    void visit(CharacterLiteral literal);
+
+    void visit(BooleanLiteral literal);
+
     void visit(FormalParameterList paramList);
 
     void visit(FormalParameter parameter);
@@ -35,5 +43,7 @@ public interface IAstVisitor {
     void visit(WhileStatement statement);
 
     void visit(Block block);
+
+    void visit(ExpressionList expressionList);
 
 }

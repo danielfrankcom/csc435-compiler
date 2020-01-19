@@ -2,16 +2,16 @@ package om.frankc.csc435.compiler.ast;
 
 import java.util.Objects;
 
-public class IntegerLiteral extends Literal {
+public class FloatLiteral extends Literal {
 
-    public IntegerLiteral(int value) {
-        assert value >= 0;
+    public FloatLiteral(float value) {
+        assert value >= 0 ;
         mValue = value;
     }
 
-    private final int mValue;
+    private final float mValue;
 
-    public int getValue() {
+    public float getValue() {
         return mValue;
     }
 
@@ -25,8 +25,8 @@ public class IntegerLiteral extends Literal {
         if (this == other) {
             return true;
         }
-        if (other instanceof IntegerLiteral) {
-            final IntegerLiteral known = (IntegerLiteral) other;
+        if (other instanceof FloatLiteral) {
+            final FloatLiteral known = (FloatLiteral) other;
             return Objects.equals(mValue, known.mValue);
         }
         return false;

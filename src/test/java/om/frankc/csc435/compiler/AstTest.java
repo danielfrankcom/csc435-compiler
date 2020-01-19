@@ -79,7 +79,7 @@ public class AstTest {
         final ImmutableMap<Integer, File> outputMap = identifyTestFiles(outputs);
 
         final File[] inputs = getTestFilesForGroup(Group.input);
-        final ImmutableMap<Integer, File> inputMap = identifyTestFiles(outputs);
+        final ImmutableMap<Integer, File> inputMap = identifyTestFiles(inputs);
 
         assertEquals(inputMap.size(), outputMap.size());
 
