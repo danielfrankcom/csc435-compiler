@@ -1,0 +1,14 @@
+int bar()
+{
+    int id3;
+
+    if (true) {
+        ;
+    }
+
+    if((5)) {
+        id = "string";
+    }else{
+    return true;
+    }
+}

@@ -1,0 +1,45 @@
+int bar ()
+{
+    int id1;
+    int id2;
+    int id3;
+    int id4;
+
+    id1<id3;
+    id1<5;
+    5<id3;
+    if (5<true)
+    {
+        return 5<"string";
+    }
+    id1==id3;
+    id1==5;
+    5==id3;
+    while (5==true)
+    {
+        return 5=="string";
+    }
+    id1+id3;
+    id1+5;
+    5+id3;
+    if (5+true)
+    {
+        return 5+"string";
+    }
+    else
+    {
+        return "concat"+"these";
+    }
+    id1-id3;
+    id1-5;
+    5-id3;
+    print 5-true;
+    println ("concat"-"these");
+    id1*id3;
+    id1*5;
+    5*id3;
+    if (5*true)
+    {
+        println ("concat"*"these");
+    }
+}

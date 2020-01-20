@@ -5,7 +5,7 @@ import java.util.Objects;
 public class WhileStatement extends Statement {
 
     public WhileStatement(Expression expression, Block block) {
-        // todo: assert expression != null;
+        assert expression != null;
         assert block != null;
 
         mExpression = expression;

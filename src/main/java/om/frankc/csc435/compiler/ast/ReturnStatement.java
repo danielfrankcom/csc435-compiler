@@ -1,18 +1,23 @@
 package om.frankc.csc435.compiler.ast;
 
 import java.util.Objects;
+import java.util.Optional;
 
-public class ExpressionStatement extends Statement {
+public class ReturnStatement extends Statement {
 
-    public ExpressionStatement(Expression expression) {
+    public ReturnStatement(Optional<Expression> expression) {
         assert expression != null;
         mExpression = expression;
     }
 
-    private final Expression mExpression;
+    private final Optional<Expression> mExpression;
 
-    public Expression getExpression() {
+    public Optional<Expression> getExpression() {
         return mExpression;
+    }
+
+    public boolean hasExpression() {
+        return mExpression.isPresent();
     }
 
     @Override
@@ -25,8 +30,8 @@ public class ExpressionStatement extends Statement {
         if (this == other) {
             return true;
         }
-        if (other instanceof ExpressionStatement) {
-            final ExpressionStatement known = (ExpressionStatement) other;
+        if (other instanceof ReturnStatement) {
+            final ReturnStatement known = (ReturnStatement) other;
             return Objects.equals(mExpression, known.mExpression);
         }
         return false;

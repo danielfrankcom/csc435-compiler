@@ -2,17 +2,25 @@ package om.frankc.csc435.compiler.ast;
 
 import java.util.Objects;
 
-public class ExpressionStatement extends Statement {
+public class IfStatement extends Statement {
 
-    public ExpressionStatement(Expression expression) {
+    public IfStatement(Expression expression, Block block) {
         assert expression != null;
+        assert block != null;
+
         mExpression = expression;
+        mBlock = block;
     }
 
     private final Expression mExpression;
+    private final Block mBlock;
 
     public Expression getExpression() {
         return mExpression;
+    }
+
+    public Block getIfBlock() {
+        return mBlock;
     }
 
     @Override
@@ -25,16 +33,17 @@ public class ExpressionStatement extends Statement {
         if (this == other) {
             return true;
         }
-        if (other instanceof ExpressionStatement) {
-            final ExpressionStatement known = (ExpressionStatement) other;
-            return Objects.equals(mExpression, known.mExpression);
+        if (other instanceof IfStatement) {
+            final IfStatement known = (IfStatement) other;
+            return Objects.equals(mExpression, known.mExpression)
+                    && Objects.equals(mBlock, known.mBlock);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(mExpression);
+        return Objects.hash(mExpression, mBlock);
     }
 
 }

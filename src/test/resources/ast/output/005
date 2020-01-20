@@ -1,0 +1,8 @@
+void foo ()
+{
+    print "hello";
+    while (true)
+    {
+        println true;
+    }
+}

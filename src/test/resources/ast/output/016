@@ -1,0 +1,29 @@
+int arrayMax (int[3] array)
+{
+    int max;
+    int index;
+
+    max=0;
+    index=0;
+    while (index<3)
+    {
+        if (max<array[index])
+        {
+            max=array[index];
+        }
+        index=index+1;
+    }
+    return max;
+}
+
+void main ()
+{
+    int[3] array;
+    int result;
+
+    array[0]=1;
+    array[1]=7;
+    array[2]=5;
+    result=arrayMax(array);
+    println result;
+}

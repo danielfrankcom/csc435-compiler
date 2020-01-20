@@ -1,0 +1,21 @@
+int bar ()
+{
+    int id3;
+
+    return ((5));
+}
+
+void foo ()
+{
+    int id3;
+
+    return;
+}
+
+float foobar ()
+{
+    while (true)
+    {
+        return "string";
+    }
+}

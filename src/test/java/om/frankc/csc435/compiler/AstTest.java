@@ -105,7 +105,7 @@ public class AstTest {
     }
 
     @Test
-    public void testCompilerAccepts() throws IOException {
+    public void testPrettyPrint() throws IOException {
 
         final ImmutableMap<File, File> testFiles = getTestFiles();
 
@@ -122,7 +122,7 @@ public class AstTest {
 
             final String[] arguments = {inputPath, "-p", outputPath};
 
-            System.out.printf("Testing %s -> %s\n", inputPath, output.getAbsolutePath());
+            System.out.printf("Testing %s -> %s -> %s\n", inputPath, outputPath, expectedPath);
 
             boolean success = false;
             try {

@@ -1,6 +1,5 @@
 int aB ()
 {
-
     while (7)
     {
     }

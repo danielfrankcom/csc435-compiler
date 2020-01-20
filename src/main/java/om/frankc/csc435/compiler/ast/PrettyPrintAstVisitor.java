@@ -1,6 +1,7 @@
 package om.frankc.csc435.compiler.ast;
 
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class PrettyPrintAstVisitor implements IAstVisitor {
@@ -96,8 +97,9 @@ public class PrettyPrintAstVisitor implements IAstVisitor {
         declaration.getTypeNode().accept(this);
         print(' ');
         declaration.getId().accept(this);
-        print(' ');
+        print(" (");
         declaration.getParamList().accept(this);
+        print(')');
     }
 
     @Override
@@ -147,8 +149,6 @@ public class PrettyPrintAstVisitor implements IAstVisitor {
 
     @Override
     public void visit(FormalParameterList paramList) {
-        print('(');
-
         final Iterator<FormalParameter> params = paramList.getElements().iterator();
         while (params.hasNext()) {
             final FormalParameter current = params.next();
@@ -158,8 +158,6 @@ public class PrettyPrintAstVisitor implements IAstVisitor {
                 print(", ");
             }
         }
-
-        print(')');
     }
 
     @Override
@@ -173,8 +171,13 @@ public class PrettyPrintAstVisitor implements IAstVisitor {
     public void visit(FunctionBody body) {
         println('{');
         mIndentationLevel++;
-        body.getDeclarations().accept(this);
-        println();
+
+        final VariableDeclarationList declarations = body.getDeclarations();
+        declarations.accept(this);
+        if (declarations.getElements().size() > 0) {
+            println();
+        }
+
         body.getStatements().accept(this);
         mIndentationLevel--;
         println('}');
@@ -211,11 +214,75 @@ public class PrettyPrintAstVisitor implements IAstVisitor {
     }
 
     @Override
+    public void visit(IfStatement statement) {
+        print("if (");
+        statement.getExpression().accept(this);
+        println(')');
+        statement.getIfBlock().accept(this);
+    }
+
+    @Override
+    public void visit(IfElseStatement statement) {
+        print("if (");
+        statement.getExpression().accept(this);
+        println(')');
+        statement.getIfBlock().accept(this);
+        println();
+        println("else");
+        statement.getElseBlock().accept(this);
+    }
+
+    @Override
     public void visit(WhileStatement statement) {
         print("while (");
         statement.getExpression().accept(this);
         println(')');
         statement.getBlock().accept(this);
+    }
+
+    @Override
+    public void visit(PrintStatement statement) {
+        print("print ");
+        statement.getExpression().accept(this);
+        print(';');
+    }
+
+    @Override
+    public void visit(PrintLineStatement statement) {
+        print("println ");
+        statement.getExpression().accept(this);
+        print(';');
+    }
+
+    @Override
+    public void visit(ReturnStatement statement) {
+        print("return");
+
+        final Optional<Expression> expression = statement.getExpression();
+        expression.ifPresent((e) -> {
+            print(' ');
+            e.accept(this);
+        });
+
+        print(';');
+    }
+
+    @Override
+    public void visit(AssignmentStatement statement) {
+        statement.getId().accept(this);
+        print('=');
+        statement.getExpression().accept(this);
+        print(';');
+    }
+
+    @Override
+    public void visit(ArrayAssignment assignment) {
+        assignment.getId().accept(this);
+        print('[');
+        assignment.getIndex().accept(this);
+        print("]=");
+        assignment.getAssignment().accept(this);
+        print(';');
     }
 
     @Override
@@ -228,8 +295,74 @@ public class PrettyPrintAstVisitor implements IAstVisitor {
     }
 
     @Override
-    public void visit(ExpressionList expressionList) {
+    public void visit(LessThanExpression expression) {
+        expression.getLeftSide().accept(this);
+        print('<');
+        expression.getRightSide().accept(this);
+    }
 
+    @Override
+    public void visit(EqualityExpression expression) {
+        expression.getLeftSide().accept(this);
+        print("==");
+        expression.getRightSide().accept(this);
+    }
+
+    @Override
+    public void visit(AddExpression expression) {
+        expression.getLeftSide().accept(this);
+        print('+');
+        expression.getRightSide().accept(this);
+    }
+
+    @Override
+    public void visit(SubtractExpression expression) {
+        expression.getLeftSide().accept(this);
+        print('-');
+        expression.getRightSide().accept(this);
+    }
+
+    @Override
+    public void visit(MultiplyExpression expression) {
+        expression.getLeftSide().accept(this);
+        print('*');
+        expression.getRightSide().accept(this);
+    }
+
+    @Override
+    public void visit(ParenExpression expression) {
+        print('(');
+        expression.getExpression().accept(this);
+        print(')');
+    }
+
+    @Override
+    public void visit(ArrayReference reference) {
+        reference.getId().accept(this);
+        print('[');
+        reference.getExpression().accept(this);
+        print(']');
+    }
+
+    @Override
+    public void visit(FunctionCall functionCall) {
+        functionCall.getId().accept(this);
+        print('(');
+        functionCall.getExpressions().accept(this);
+        print(')');
+    }
+
+    @Override
+    public void visit(ExpressionList expressionList) {
+        final Iterator<Expression> expressions = expressionList.getElements().iterator();
+        while (expressions.hasNext()) {
+            final Expression current = expressions.next();
+            current.accept(this);
+
+            if (expressions.hasNext()) {
+                print(",");
+            }
+        }
     }
 
 }

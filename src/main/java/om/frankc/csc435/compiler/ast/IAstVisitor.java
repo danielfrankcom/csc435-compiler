@@ -40,9 +40,39 @@ public interface IAstVisitor {
 
     void visit(ExpressionStatement statement);
 
+    void visit(IfStatement statement);
+
+    void visit(IfElseStatement statement);
+
     void visit(WhileStatement statement);
 
+    void visit(PrintStatement statement);
+
+    void visit(PrintLineStatement statement);
+
+    void visit(ReturnStatement statement);
+
+    void visit(AssignmentStatement statement);
+
+    void visit(ArrayAssignment assignment);
+
     void visit(Block block);
+
+    void visit(LessThanExpression expression);
+
+    void visit(EqualityExpression expression);
+
+    void visit(AddExpression expression);
+
+    void visit(SubtractExpression expression);
+
+    void visit(MultiplyExpression expression);
+
+    void visit(ParenExpression expression);
+
+    void visit(ArrayReference reference);
+
+    void visit(FunctionCall functionCall);
 
     void visit(ExpressionList expressionList);
 

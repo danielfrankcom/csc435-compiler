@@ -2,14 +2,22 @@ package om.frankc.csc435.compiler.ast;
 
 import java.util.Objects;
 
-public class ExpressionStatement extends Statement {
+public class ArrayReference extends Expression {
 
-    public ExpressionStatement(Expression expression) {
+    public ArrayReference(Identifier id, Expression expression) {
+        assert id != null;
         assert expression != null;
+
+        mId = id;
         mExpression = expression;
     }
 
+    private final Identifier mId;
     private final Expression mExpression;
+
+    public Identifier getId() {
+        return mId;
+    }
 
     public Expression getExpression() {
         return mExpression;
@@ -25,16 +33,17 @@ public class ExpressionStatement extends Statement {
         if (this == other) {
             return true;
         }
-        if (other instanceof ExpressionStatement) {
-            final ExpressionStatement known = (ExpressionStatement) other;
-            return Objects.equals(mExpression, known.mExpression);
+        if (other instanceof ArrayReference) {
+            final ArrayReference known = (ArrayReference) other;
+            return Objects.equals(mId, known.mId)
+                    && Objects.equals(mExpression, known.mExpression);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(mExpression);
+        return Objects.hash(mId, mExpression);
     }
 
 }

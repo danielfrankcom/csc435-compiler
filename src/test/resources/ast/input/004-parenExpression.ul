@@ -1,0 +1,10 @@
+void foo()
+{
+    (id);
+    (0.0);
+    ("string");
+    (true);
+    while((true)) {
+        ;
+    }
+}

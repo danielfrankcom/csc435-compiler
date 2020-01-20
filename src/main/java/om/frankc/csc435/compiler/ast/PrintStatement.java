@@ -2,9 +2,9 @@ package om.frankc.csc435.compiler.ast;
 
 import java.util.Objects;
 
-public class ExpressionStatement extends Statement {
+public class PrintStatement extends Statement {
 
-    public ExpressionStatement(Expression expression) {
+    public PrintStatement(Expression expression) {
         assert expression != null;
         mExpression = expression;
     }
@@ -25,8 +25,8 @@ public class ExpressionStatement extends Statement {
         if (this == other) {
             return true;
         }
-        if (other instanceof ExpressionStatement) {
-            final ExpressionStatement known = (ExpressionStatement) other;
+        if (other instanceof PrintStatement) {
+            final PrintStatement known = (PrintStatement) other;
             return Objects.equals(mExpression, known.mExpression);
         }
         return false;

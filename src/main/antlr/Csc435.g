@@ -97,8 +97,8 @@ formalParameters returns [FormalParameterList paramList]
 }
 | // epsilon.
 {
-    final List<FormalParameter> parameters = Collections.emptyList();
-    return new FormalParameterList(parameters);
+    params = Collections.emptyList();
+    return new FormalParameterList(params);
 };
 
 moreFormals returns [List<FormalParameter> parameters]
@@ -204,17 +204,34 @@ statement returns [Statement statement]
 {
     return e;
 }
-| IF OPEN_PAREN expr CLOSE_PAREN block (ELSE block)?
+| i=ifElseStatement
+{
+    return i;
+}
 | w=whileStatement
 {
     return w;
 }
-| PRINT expr SEMICOLON
-| PRINTLN expr SEMICOLON
-| RETURN expr? SEMICOLON
-| ID EQUALS expr SEMICOLON
-| ID OPEN_BRACKET expr CLOSE_BRACKET EQUALS expr SEMICOLON
-;
+| p=printStatement
+{
+    return p;
+}
+| pl=printLineStatement
+{
+    return pl;
+}
+| r=returnStatement
+{
+    return r;
+}
+| assign=assignmentStatement
+{
+    return assign;
+}
+| arrayAssign=arrayAssignment
+{
+    return arrayAssign;
+};
 
 exprStatement returns [ExpressionStatement statement]
 : e=expr SEMICOLON
@@ -222,12 +239,52 @@ exprStatement returns [ExpressionStatement statement]
     return new ExpressionStatement(e);
 };
 
-// todo: if statement
+ifElseStatement returns [IfStatement statement]
+: IF OPEN_PAREN e=expr CLOSE_PAREN bIf=block (ELSE bElse=block)?
+{
+    if (bElse == null) {
+        return new IfStatement(e, bIf);
+    } else {
+        return new IfElseStatement(e, bIf, bElse);
+    }
+};
 
 whileStatement returns [WhileStatement statement]
 : WHILE OPEN_PAREN e=expr CLOSE_PAREN b=block
 {
     return new WhileStatement(e, b);
+};
+
+printStatement returns [PrintStatement statement]
+: PRINT e=expr SEMICOLON
+{
+    return new PrintStatement(e);
+};
+
+printLineStatement returns [PrintLineStatement statement]
+: PRINTLN e=expr SEMICOLON
+{
+    return new PrintLineStatement(e);
+};
+
+returnStatement returns [ReturnStatement statement]
+: RETURN (e=expr)? SEMICOLON
+{
+    final Optional<Expression> optional =
+            (e == null) ? Optional.empty(): Optional.of(e);
+    return new ReturnStatement(optional);
+};
+
+assignmentStatement returns [AssignmentStatement statement]
+: i=id EQUALS e=expr SEMICOLON
+{
+    return new AssignmentStatement(i, e);
+};
+
+arrayAssignment returns [ArrayAssignment assignment]
+: i=id OPEN_BRACKET index=expr CLOSE_BRACKET EQUALS assign=expr SEMICOLON
+{
+    return new ArrayAssignment(i, index, assign);
 };
 
 block returns [Block block]
@@ -242,35 +299,54 @@ expr returns [Expression expression]
     return e;
 };
 
-// todo
 equality returns [Expression expression]
-: e=lessThan (EQUAL_OP lessThan)*
+: e1=lessThan (EQUAL_OP e2=lessThan)*
 {
-    return e;
+    if (e2 == null) {
+        return e1;
+    } else {
+        return new EqualityExpression(e1, e2);
+    }
 };
 
 lessThan returns [Expression expression]
-: e=sum (LESS_OP sum)*
+: e1=sum (LESS_OP e2=sum)*
 {
-    return e;
+    if (e2 == null) {
+        return e1;
+    } else {
+        return new LessThanExpression(e1, e2);
+    }
 };
 
 sum returns [Expression expression]
-: e=sub (ADD_OP sub)*
+: e1=sub (ADD_OP e2=sub)*
 {
-    return e;
+    if (e2 == null) {
+        return e1;
+    } else {
+        return new AddExpression(e1, e2);
+    }
 };
 
 sub returns [Expression expression]
-: e=mult (SUB_OP sub)*
+: e1=mult (SUB_OP e2=sub)*
 {
-    return e;
+    if (e2 == null) {
+        return e1;
+    } else {
+        return new SubtractExpression(e1, e2);
+    }
 };
 
 mult returns [Expression expression]
-: e=atom (MULT_OP atom)*
+: e1=atom (MULT_OP e2=atom)*
 {
-    return e;
+    if (e2 == null) {
+        return e1;
+    } else {
+        return new MultiplyExpression(e1, e2);
+    }
 };
 
 atom returns [Expression expression]
@@ -282,10 +358,18 @@ atom returns [Expression expression]
 {
     return i;
 }
-| OPEN_PAREN expr CLOSE_PAREN
-| ID OPEN_BRACKET expr CLOSE_BRACKET
-| ID OPEN_PAREN exprList CLOSE_PAREN
-;
+| p=parenExpr
+{
+    return p;
+}
+| a=arrayReference
+{
+    return a;
+}
+| f=functionCall
+{
+    return f;
+};
 
 literal returns [Literal literal]
 : s=stringLiteral
@@ -353,11 +437,48 @@ id returns [Identifier id]
     return new Identifier(text);
 };
 
-exprList    : expr exprMore*
-            | // epsilon.
-            ;
+parenExpr returns [ParenExpression expression]
+: OPEN_PAREN e=expr CLOSE_PAREN
+{
+    return new ParenExpression(e);
+};
 
-exprMore : COMMA expr ;
+arrayReference returns [ArrayReference reference]
+: i=id OPEN_BRACKET e=expr CLOSE_BRACKET
+{
+    return new ArrayReference(i, e);
+};
+
+functionCall returns [FunctionCall functionCall]
+: i=id OPEN_PAREN e=exprList CLOSE_PAREN
+{
+    return new FunctionCall(i, e);
+};
+
+exprList returns [ExpressionList exprList]
+: e=expr expressions=exprMore
+{
+    expressions.add(0, e);
+    return new ExpressionList(expressions);
+}
+| // epsilon.
+{
+    expressions = Collections.emptyList();
+    return new ExpressionList(expressions);
+};
+
+exprMore returns [List<Expression> expressions]
+    @init {
+        expressions = new LinkedList<>();
+    }
+:   (COMMA expression=expr
+        {
+            expressions.add(expression);
+        }
+    )*
+{
+    return expressions;
+};
 
 
 /* Lexer */

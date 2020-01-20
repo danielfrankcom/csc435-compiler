@@ -1,0 +1,33 @@
+int sampleOne (int x, float y)
+{
+    void id3;
+
+    if (x<y)
+    {
+        while (true)
+        {
+            if (false)
+            {
+                if (id3)
+                {
+                    return "string";
+                }
+                else
+                {
+                    return 6;
+                }
+            }
+        }
+    }
+    else
+    {
+        while (5)
+        {
+            while (6)
+            {
+                return 0.0;
+            }
+        }
+    }
+    return id3;
+}

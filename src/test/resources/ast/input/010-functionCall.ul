@@ -1,0 +1,15 @@
+int bar ()
+{
+    int id3;
+
+    id3();
+    id3(    id4, 5,
+        "hello",
+        'c', 0.0);
+
+    if (isWritingACompilerHard()) {
+        cry();
+    }
+
+    return getReturn(id3);
+}

@@ -1,0 +1,14 @@
+int bar ()
+{
+    int id3;
+    int[5] id4;
+
+    id3="invalid";
+    id4[0]="string";
+    while (true)
+    {
+        id3=0;
+        id4[(id3)]=(0);
+        id3=((((65))));
+    }
+}
