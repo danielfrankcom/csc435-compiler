@@ -60,7 +60,7 @@ options {
 program returns [Program program]
 : f=functions EOF
 {
-    return new Program(f);
+    program = new Program(f);
 };
 
 functions returns [FunctionList fns]
@@ -73,19 +73,19 @@ functions returns [FunctionList fns]
         }
     )+
 {
-    return new FunctionList(functions);
+    fns = new FunctionList(functions);
 };
 
 function returns [Function function]
 : declaration=functionDecl body=functionBody
 {
-    return new Function(declaration, body);
+    function = new Function(declaration, body);
 };
 
 functionDecl returns [FunctionDeclaration declaration]
 : t=compoundType i=id OPEN_PAREN params=formalParameters CLOSE_PAREN
 {
-    return new FunctionDeclaration(t, i, params);
+    declaration = new FunctionDeclaration(t, i, params);
 };
 
 formalParameters returns [FormalParameterList paramList]
@@ -93,12 +93,12 @@ formalParameters returns [FormalParameterList paramList]
 {
     final FormalParameter firstParam = new FormalParameter(t, i);
     params.add(0, firstParam);
-    return new FormalParameterList(params);
+    paramList = new FormalParameterList(params);
 }
 | // epsilon.
 {
     params = Collections.emptyList();
-    return new FormalParameterList(params);
+    paramList = new FormalParameterList(params);
 };
 
 moreFormals returns [List<FormalParameter> parameters]
@@ -110,20 +110,18 @@ moreFormals returns [List<FormalParameter> parameters]
             parameters.add(param);
         }
     )*
-{
-    return parameters;
-};
+;
 
 formalParameter returns [FormalParameter parameter]
 : t=compoundType i=id
 {
-    return new FormalParameter(t, i);
+    parameter = new FormalParameter(t, i);
 };
 
 functionBody returns [FunctionBody body]
 : OPEN_BRACE decls=varDecls stmts=statements CLOSE_BRACE
 {
-    return new FunctionBody(decls, stmts);
+    body = new FunctionBody(decls, stmts);
 };
 
 varDecls returns [VariableDeclarationList declList]
@@ -136,7 +134,7 @@ varDecls returns [VariableDeclarationList declList]
         }
     )*
 {
-    return new VariableDeclarationList(declarations);
+    declList = new VariableDeclarationList(declarations);
 };
 
 statements returns [StatementList stmts]
@@ -153,118 +151,118 @@ statements returns [StatementList stmts]
         }
     )*
 {
-    return new StatementList(statements);
+    stmts = new StatementList(statements);
 };
 
 compoundType returns [TypeNode type]
 : t=type
 {
-    return t;
+    type = t;
 }
 | t=type OPEN_BRACKET constant=intLiteral CLOSE_BRACKET
 {
-    return new ArrayType(t, constant);
+    type = new ArrayType(t, constant);
 };
 
 type returns [Type type]
 : INT
 {
-    return Type.INT;
+    type = Type.INT;
 }
 | FLOAT
 {
-    return Type.FLOAT;
+    type = Type.FLOAT;
 }
 | CHAR
 {
-    return Type.CHAR;
+    type = Type.CHAR;
 }
 | STRING
 {
-    return Type.STRING;
+    type = Type.STRING;
 }
 | BOOLEAN
 {
-    return Type.BOOLEAN;
+    type = Type.BOOLEAN;
 }
 | VOID
 {
-    return Type.VOID;
+    type = Type.VOID;
 };
 
 varDecl returns [VariableDeclaration declaration]
 : t=compoundType i=id SEMICOLON
 {
-    return new VariableDeclaration(t, i);
+    declaration = new VariableDeclaration(t, i);
 };
 
 statement returns [Statement statement]
 : SEMICOLON // ignore.
 | e=exprStatement
 {
-    return e;
+    statement = e;
 }
 | i=ifElseStatement
 {
-    return i;
+    statement = i;
 }
 | w=whileStatement
 {
-    return w;
+    statement = w;
 }
 | p=printStatement
 {
-    return p;
+    statement = p;
 }
 | pl=printLineStatement
 {
-    return pl;
+    statement = pl;
 }
 | r=returnStatement
 {
-    return r;
+    statement = r;
 }
 | assign=assignmentStatement
 {
-    return assign;
+    statement = assign;
 }
 | arrayAssign=arrayAssignment
 {
-    return arrayAssign;
+    statement = arrayAssign;
 };
 
 exprStatement returns [ExpressionStatement statement]
 : e=expr SEMICOLON
 {
-    return new ExpressionStatement(e);
+    statement = new ExpressionStatement(e);
 };
 
 ifElseStatement returns [IfStatement statement]
 : IF OPEN_PAREN e=expr CLOSE_PAREN bIf=block (ELSE bElse=block)?
 {
     if (bElse == null) {
-        return new IfStatement(e, bIf);
+        statement = new IfStatement(e, bIf);
     } else {
-        return new IfElseStatement(e, bIf, bElse);
+        statement = new IfElseStatement(e, bIf, bElse);
     }
 };
 
 whileStatement returns [WhileStatement statement]
 : WHILE OPEN_PAREN e=expr CLOSE_PAREN b=block
 {
-    return new WhileStatement(e, b);
+    statement = new WhileStatement(e, b);
 };
 
 printStatement returns [PrintStatement statement]
 : PRINT e=expr SEMICOLON
 {
-    return new PrintStatement(e);
+    statement = new PrintStatement(e);
 };
 
 printLineStatement returns [PrintLineStatement statement]
 : PRINTLN e=expr SEMICOLON
 {
-    return new PrintLineStatement(e);
+    statement = new PrintLineStatement(e);
 };
 
 returnStatement returns [ReturnStatement statement]
@@ -272,146 +270,151 @@ returnStatement returns [ReturnStatement statement]
 {
     final Optional<Expression> optional =
             (e == null) ? Optional.empty(): Optional.of(e);
-    return new ReturnStatement(optional);
+    statement = new ReturnStatement(optional);
 };
 
 assignmentStatement returns [AssignmentStatement statement]
 : i=id EQUALS e=expr SEMICOLON
 {
-    return new AssignmentStatement(i, e);
+    statement = new AssignmentStatement(i, e);
 };
 
 arrayAssignment returns [ArrayAssignment assignment]
 : i=id OPEN_BRACKET index=expr CLOSE_BRACKET EQUALS assign=expr SEMICOLON
 {
-    return new ArrayAssignment(i, index, assign);
+    assignment = new ArrayAssignment(i, index, assign);
 };
 
 block returns [Block block]
 : OPEN_BRACE s=statements CLOSE_BRACE
 {
-    return new Block(s);
+    block = new Block(s);
 };
 
 expr returns [Expression expression]
 : e=equality
 {
-    return e;
+    expression = e;
 };
 
 equality returns [Expression expression]
-: e1=lessThan (EQUAL_OP e2=lessThan)*
+:   current=lessThan
+    (EQUAL_OP e2=lessThan
+        {
+            current = new EqualityExpression(current, e2);
+        }
+    )*
 {
-    if (e2 == null) {
-        return e1;
-    } else {
-        return new EqualityExpression(e1, e2);
-    }
+    expression = current;
 };
 
 lessThan returns [Expression expression]
-: e1=sum (LESS_OP e2=sum)*
+:   current=sum
+    (LESS_OP e2=sum
+        {
+            current = new LessThanExpression(current, e2);
+        }
+    )*
 {
-    if (e2 == null) {
-        return e1;
-    } else {
-        return new LessThanExpression(e1, e2);
-    }
+    expression = current;
 };
 
 sum returns [Expression expression]
-: e1=sub (ADD_OP e2=sub)*
+:   current=sub
+    (ADD_OP e2=sub
+        {
+            current = new AddExpression(current, e2);
+        }
+    )*
 {
-    if (e2 == null) {
-        return e1;
-    } else {
-        return new AddExpression(e1, e2);
-    }
+    expression = current;
 };
 
 sub returns [Expression expression]
-: e1=mult (SUB_OP e2=sub)*
+:   current=mult
+    (SUB_OP e2=mult
+        {
+            current = new SubtractExpression(current, e2);
+        }
+    )*
 {
-    if (e2 == null) {
-        return e1;
-    } else {
-        return new SubtractExpression(e1, e2);
-    }
+    expression = current;
 };
 
 mult returns [Expression expression]
-: e1=atom (MULT_OP e2=atom)*
+:   current=atom
+    (MULT_OP e2=atom
+        {
+            current = new MultiplyExpression(current, e2);
+        }
+    )*
 {
-    if (e2 == null) {
-        return e1;
-    } else {
-        return new MultiplyExpression(e1, e2);
-    }
+    expression = current;
 };
 
 atom returns [Expression expression]
 : l=literal
 {
-    return l;
+    expression = l;
 }
 | i=id
 {
-    return i;
+    expression = i;
 }
 | p=parenExpr
 {
-    return p;
+    expression = p;
 }
 | a=arrayReference
 {
-    return a;
+    expression = a;
 }
 | f=functionCall
 {
-    return f;
+    expression = f;
 };
 
 literal returns [Literal literal]
 : s=stringLiteral
 {
-    return s;
+    literal = s;
 }
 | i=intLiteral
 {
-    return i;
+    literal = i;
 }
 | f=floatLiteral
 {
-    return f;
+    literal = f;
 }
 | c=charLiteral
 {
-    return c;
+    literal = c;
 }
 | b=booleanLiteral
 {
-    return b;
+    literal = b;
 };
 
 stringLiteral returns [StringLiteral literal]
 : constant=STRING_CONSTANT
 {
     final String value = constant.getText();
-    return new StringLiteral(value);
+    literal = new StringLiteral(value);
 };
 
 intLiteral returns [IntegerLiteral literal]
 : constant=INT_CONSTANT
 {
     final int value = Integer.parseInt(constant.getText());
-    return new IntegerLiteral(value);
+    literal = new IntegerLiteral(value);
 };
 
 floatLiteral returns [FloatLiteral literal]
 : constant=FLOAT_CONSTANT
 {
     final float value = Float.parseFloat(constant.getText());
-    return new FloatLiteral(value);
+    literal = new FloatLiteral(value);
 };
 
 charLiteral returns [CharacterLiteral literal]
@@ -420,51 +423,51 @@ charLiteral returns [CharacterLiteral literal]
     final String text = constant.getText();
     assert text.length() == 3; // Account for quotes.
     final char value = text.charAt(1);
-    return new CharacterLiteral(value);
+    literal = new CharacterLiteral(value);
 };
 
 booleanLiteral returns [BooleanLiteral literal]
 : constant=BOOLEAN_CONSTANT
 {
     final boolean value = Boolean.parseBoolean(constant.getText());
-    return new BooleanLiteral(value);
+    literal = new BooleanLiteral(value);
 };
 
 id returns [Identifier id]
 : i=ID
 {
     final String text = i.getText();
-    return new Identifier(text);
+    id = new Identifier(text);
 };
 
 parenExpr returns [ParenExpression expression]
 : OPEN_PAREN e=expr CLOSE_PAREN
 {
-    return new ParenExpression(e);
+    expression = new ParenExpression(e);
 };
 
 arrayReference returns [ArrayReference reference]
 : i=id OPEN_BRACKET e=expr CLOSE_BRACKET
 {
-    return new ArrayReference(i, e);
+    reference = new ArrayReference(i, e);
 };
 
 functionCall returns [FunctionCall functionCall]
 : i=id OPEN_PAREN e=exprList CLOSE_PAREN
 {
-    return new FunctionCall(i, e);
+    functionCall = new FunctionCall(i, e);
 };
 
 exprList returns [ExpressionList exprList]
 : e=expr expressions=exprMore
 {
     expressions.add(0, e);
-    return new ExpressionList(expressions);
+    exprList = new ExpressionList(expressions);
 }
 | // epsilon.
 {
     expressions = Collections.emptyList();
-    return new ExpressionList(expressions);
+    exprList = new ExpressionList(expressions);
 };
 
 exprMore returns [List<Expression> expressions]
@@ -476,9 +479,7 @@ exprMore returns [List<Expression> expressions]
             expressions.add(expression);
         }
     )*
-{
-    return expressions;
-};
+;
 
 
 /* Lexer */
