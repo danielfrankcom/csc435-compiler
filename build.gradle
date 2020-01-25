@@ -4,9 +4,9 @@ plugins {
 }
 
 group 'om.frankc.csc435'
-version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
@@ -21,4 +21,18 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'commons-io:commons-io:2.6'
 
+}
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'CSC 435 Toy Compiler',
+                'Implementation-Version': '0.1',
+                'Main-Class': 'om.frankc.csc435.compiler.Compiler'
+    }
+    archiveFileName = "csc435-compiler.jar"
+    from {
+        configurations.compile.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
 }
