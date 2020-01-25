@@ -7,7 +7,9 @@ import java.util.Objects;
 
 public abstract class NodeList<E extends AstNode> extends AstNode {
 
-    public NodeList(List<E> elements) {
+    public NodeList(List<E> elements,
+                    int lineNumber, int linePosition) {
+        super(lineNumber, linePosition);
         assert elements != null;
         mElements = elements;
     }
@@ -28,14 +30,15 @@ public abstract class NodeList<E extends AstNode> extends AstNode {
         }
         if (other instanceof NodeList) {
             final NodeList<?> known = (NodeList<?>) other;
-            return Objects.equals(mElements, known.mElements);
+            return super.equals(known)
+                    && Objects.equals(mElements, known.mElements);
         }
         return false;
     }
 
     @Override
     public final int hashCode() {
-        return Objects.hashCode(mElements);
+        return Objects.hash(super.hashCode(), mElements);
     }
 
 }

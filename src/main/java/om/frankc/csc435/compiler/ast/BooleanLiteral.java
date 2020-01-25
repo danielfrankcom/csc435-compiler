@@ -4,7 +4,9 @@ import java.util.Objects;
 
 public class BooleanLiteral extends Literal {
 
-    public BooleanLiteral(boolean value) {
+    public BooleanLiteral(boolean value,
+                          int lineNumber, int linePosition) {
+        super(lineNumber, linePosition);
         mValue = value;
     }
 
@@ -26,14 +28,15 @@ public class BooleanLiteral extends Literal {
         }
         if (other instanceof BooleanLiteral) {
             final BooleanLiteral known = (BooleanLiteral) other;
-            return Objects.equals(mValue, known.mValue);
+            return super.equals(known)
+                    && Objects.equals(mValue, known.mValue);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(mValue);
+        return Objects.hash(super.hashCode(), mValue);
     }
 
 }

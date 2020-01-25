@@ -4,7 +4,9 @@ import java.util.Objects;
 
 public class AssignmentStatement extends Statement {
 
-    public AssignmentStatement(Identifier id, Expression expression) {
+    public AssignmentStatement(Identifier id, Expression expression,
+                               int lineNumber, int linePosition) {
+        super(lineNumber, linePosition);
         assert id != null;
         assert expression != null;
 
@@ -35,7 +37,8 @@ public class AssignmentStatement extends Statement {
         }
         if (other instanceof AssignmentStatement) {
             final AssignmentStatement known = (AssignmentStatement) other;
-            return Objects.equals(mId, known.mId)
+            return super.equals(known)
+                    && Objects.equals(mId, known.mId)
                     && Objects.equals(mExpression, known.mExpression);
         }
         return false;
@@ -43,7 +46,7 @@ public class AssignmentStatement extends Statement {
 
     @Override
     public int hashCode() {
-        return Objects.hash(mId, mExpression);
+        return Objects.hash(super.hashCode(), mId, mExpression);
     }
 
 }

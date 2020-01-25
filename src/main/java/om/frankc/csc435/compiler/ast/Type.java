@@ -4,14 +4,7 @@ import java.util.Objects;
 
 public class Type extends TypeNode {
 
-    public static final Type BOOLEAN = new Type(TypeName.Boolean);
-    public static final Type CHAR = new Type(TypeName.Character);
-    public static final Type FLOAT = new Type(TypeName.FloatingPoint);
-    public static final Type INT = new Type(TypeName.Integer);
-    public static final Type STRING = new Type(TypeName.String);
-    public static final Type VOID = new Type(TypeName.Void);
-
-    private enum TypeName {
+    public enum Name {
         Boolean("boolean"),
         Character("char"),
         FloatingPoint("float"),
@@ -19,7 +12,7 @@ public class Type extends TypeNode {
         String("string"),
         Void("void");
 
-        TypeName(String name) {
+        Name(String name) {
             assert name != null;
             mName = name;
         }
@@ -32,11 +25,13 @@ public class Type extends TypeNode {
 
     }
 
-    private Type(TypeName type) {
+    public Type(Name type,
+                int lineNumber, int linePosition) {
+        super(lineNumber, linePosition);
         mType = type;
     }
 
-    private final TypeName mType;
+    private final Name mType;
 
     public String getName() {
         return mType.getName();
@@ -54,14 +49,15 @@ public class Type extends TypeNode {
         }
         if (other instanceof Type) {
             final Type known = (Type) other;
-            return Objects.equals(mType, known.mType);
+            return super.equals(known)
+                    && Objects.equals(mType, known.mType);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(mType);
+        return Objects.hash(super.hashCode(), mType);
     }
 
 }

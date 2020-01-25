@@ -4,8 +4,9 @@ import java.util.List;
 
 public class FunctionList extends NodeList<Function> {
 
-    public FunctionList(List<Function> functions) {
-        super(functions);
+    public FunctionList(List<Function> functions,
+                        int lineNumber, int linePosition) {
+        super(functions, lineNumber, linePosition);
     }
 
     @Override

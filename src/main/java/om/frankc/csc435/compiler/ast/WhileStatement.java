@@ -4,7 +4,9 @@ import java.util.Objects;
 
 public class WhileStatement extends Statement {
 
-    public WhileStatement(Expression expression, Block block) {
+    public WhileStatement(Expression expression, Block block,
+                          int lineNumber, int linePosition) {
+        super(lineNumber, linePosition);
         assert expression != null;
         assert block != null;
 
@@ -35,7 +37,8 @@ public class WhileStatement extends Statement {
         }
         if (other instanceof WhileStatement) {
             final WhileStatement known = (WhileStatement) other;
-            return Objects.equals(mExpression, known.mExpression)
+            return super.equals(known)
+                    && Objects.equals(mExpression, known.mExpression)
                     && Objects.equals(mBlock, known.mBlock);
         }
         return false;
@@ -43,7 +46,7 @@ public class WhileStatement extends Statement {
 
     @Override
     public int hashCode() {
-        return Objects.hash(mExpression, mBlock);
+        return Objects.hash(super.hashCode(), mExpression, mBlock);
     }
 
 }

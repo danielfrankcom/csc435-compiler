@@ -4,7 +4,9 @@ import java.util.Objects;
 
 public class ArrayAssignment extends Statement {
 
-    public ArrayAssignment(Identifier id, Expression index, Expression assignment) {
+    public ArrayAssignment(Identifier id, Expression index, Expression assignment,
+                           int lineNumber, int linePosition) {
+        super(lineNumber, linePosition);
         assert id != null;
         assert index != null;
         assert assignment != null;
@@ -42,7 +44,8 @@ public class ArrayAssignment extends Statement {
         }
         if (other instanceof ArrayAssignment) {
             final ArrayAssignment known = (ArrayAssignment) other;
-            return Objects.equals(mId, known.mId)
+            return super.equals(known)
+                    && Objects.equals(mId, known.mId)
                     && Objects.equals(mIndex, known.mIndex)
                     && Objects.equals(mAssignment, known.mAssignment);
         }
@@ -51,7 +54,7 @@ public class ArrayAssignment extends Statement {
 
     @Override
     public int hashCode() {
-        return Objects.hash(mId, mIndex, mAssignment);
+        return Objects.hash(super.hashCode(), mId, mIndex, mAssignment);
     }
 
 }

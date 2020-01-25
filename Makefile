@@ -1,12 +1,12 @@
 # This file currently assumes that 'make' is being called 
 # from the root directory of the project.
 
-all: clean build
+all: build
 
-jar:
+jar: clean
 	./gradlew jar
 
-build:
+build: clean
 	./gradlew build
 
 clean:

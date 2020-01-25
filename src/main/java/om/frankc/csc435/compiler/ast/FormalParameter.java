@@ -4,7 +4,9 @@ import java.util.Objects;
 
 public class FormalParameter extends AstNode {
 
-    public FormalParameter(TypeNode typeNode, Identifier id) {
+    public FormalParameter(TypeNode typeNode, Identifier id,
+                           int lineNumber, int linePosition) {
+        super(lineNumber, linePosition);
         assert typeNode != null;
         assert id != null;
 
@@ -35,14 +37,15 @@ public class FormalParameter extends AstNode {
         }
         if (other instanceof FormalParameter) {
             final FormalParameter known = (FormalParameter) other;
-            return Objects.equals(mTypeNode, known.mTypeNode);
+            return super.equals(known)
+                    && Objects.equals(mTypeNode, known.mTypeNode);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(mTypeNode);
+        return Objects.hash(super.hashCode(), mTypeNode);
     }
 
 }

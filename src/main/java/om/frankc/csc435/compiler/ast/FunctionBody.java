@@ -4,7 +4,9 @@ import java.util.Objects;
 
 public class FunctionBody extends AstNode {
 
-    public FunctionBody(VariableDeclarationList declarations, StatementList statements) {
+    public FunctionBody(VariableDeclarationList declarations, StatementList statements,
+                        int lineNumber, int linePosition) {
+        super(lineNumber, linePosition);
         assert declarations != null;
         assert statements != null;
         mDeclarations = declarations;
@@ -34,7 +36,8 @@ public class FunctionBody extends AstNode {
         }
         if (other instanceof FunctionBody) {
             final FunctionBody known = (FunctionBody) other;
-            return Objects.equals(mDeclarations, known.mDeclarations)
+            return super.equals(known)
+                    && Objects.equals(mDeclarations, known.mDeclarations)
                     && Objects.equals(mStatements, known.mStatements);
         }
         return false;
@@ -42,7 +45,7 @@ public class FunctionBody extends AstNode {
 
     @Override
     public int hashCode() {
-        return Objects.hash(mDeclarations, mStatements);
+        return Objects.hash(super.hashCode(), mDeclarations, mStatements);
     }
 
 }

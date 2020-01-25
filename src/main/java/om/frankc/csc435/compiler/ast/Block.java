@@ -4,7 +4,9 @@ import java.util.Objects;
 
 public class Block extends AstNode {
 
-    public Block(StatementList statements) {
+    public Block(StatementList statements,
+                 int lineNumber, int linePosition) {
+        super(lineNumber, linePosition);
         assert statements != null;
         mStatements = statements;
     }
@@ -27,14 +29,15 @@ public class Block extends AstNode {
         }
         if (other instanceof Block) {
             final Block known = (Block) other;
-            return Objects.equals(mStatements, known.mStatements);
+            return super.equals(known)
+                    && Objects.equals(mStatements, known.mStatements);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(mStatements);
+        return Objects.hash(super.hashCode(), mStatements);
     }
 
 }

@@ -4,8 +4,9 @@ import java.util.List;
 
 public class FormalParameterList extends NodeList<FormalParameter> {
 
-    public FormalParameterList(List<FormalParameter> parameters) {
-        super(parameters);
+    public FormalParameterList(List<FormalParameter> parameters,
+                               int lineNumber, int linePosition) {
+        super(parameters, lineNumber, linePosition);
     }
 
     @Override

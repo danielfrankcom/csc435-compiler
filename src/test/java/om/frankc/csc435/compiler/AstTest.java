@@ -1,16 +1,20 @@
 package om.frankc.csc435.compiler;
 
 import com.google.common.collect.ImmutableMap;
+import om.frankc.csc435.compiler.ast.*;
+import om.frankc.csc435.compiler.generated.Csc435Lexer;
+import om.frankc.csc435.compiler.generated.Csc435Parser;
+import org.antlr.runtime.ANTLRInputStream;
+import org.antlr.runtime.CommonTokenStream;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -148,6 +152,142 @@ public class AstTest {
                 fail();
             }
         }
+    }
+
+    private static Program getProgram(URL inputLocation) throws Exception {
+        final ANTLRInputStream input = new ANTLRInputStream(new FileInputStream(inputLocation.getPath()));
+
+        final Csc435Lexer lexer = new Csc435Lexer(input);
+        final CommonTokenStream tokens = new CommonTokenStream(lexer);
+        final Csc435Parser parser = new Csc435Parser(tokens);
+
+        return parser.program();
+    }
+
+    @Test
+    public void testAstConstruction() throws Exception {
+        final URL input = CLASS_LOADER.getResource("ast/input/012-operatorPrecedence.ul");
+        final Program program = getProgram(input);
+
+        final Program expected = new Program(
+                new FunctionList(
+                        new ArrayList<>() {{
+                            add(
+                                    new Function(
+                                            new FunctionDeclaration(
+                                                    new Type(Type.Name.Integer, 1, 0),
+                                                    new Identifier("bar", 1, 4),
+                                                    new FormalParameterList(Collections.emptyList(), 1, 8),
+                                                    1,
+                                                    0
+                                            ),
+                                            new FunctionBody(
+                                                    new VariableDeclarationList(Collections.emptyList(), 2, 0),
+                                                    new StatementList(
+                                                            new ArrayList<>() {{
+                                                                add(
+                                                                        new ArrayAssignment(
+                                                                                new Identifier("id", 3, 4),
+                                                                                new IntegerLiteral(5, 3, 7),
+                                                                                new MultiplyExpression(
+                                                                                        new ParenExpression(
+                                                                                                new EqualityExpression(
+                                                                                                        new ParenExpression(
+                                                                                                                new AddExpression(
+                                                                                                                        new IntegerLiteral(6, 3, 14),
+                                                                                                                        new MultiplyExpression(
+                                                                                                                                new IntegerLiteral(6, 3, 18),
+                                                                                                                                new IntegerLiteral(4, 3, 22),
+                                                                                                                                3,
+                                                                                                                                20
+                                                                                                                        ),
+                                                                                                                        3,
+                                                                                                                        16
+                                                                                                                ),
+                                                                                                                3,
+                                                                                                                13
+                                                                                                        ),
+                                                                                                        new IntegerLiteral(5, 3, 28),
+                                                                                                        3,
+                                                                                                        25
+                                                                                                ),
+                                                                                                3,
+                                                                                                12
+                                                                                        ),
+                                                                                        new ParenExpression(
+                                                                                                new SubtractExpression(
+                                                                                                        new IntegerLiteral(5, 3, 34),
+                                                                                                        new IntegerLiteral(6, 3, 38),
+                                                                                                        3,
+                                                                                                        36
+                                                                                                ),
+                                                                                                3,
+                                                                                                33
+                                                                                        ),
+                                                                                        3,
+                                                                                        31
+                                                                                ),
+                                                                                3,
+                                                                                4
+                                                                        )
+                                                                );
+                                                                add(
+                                                                        new AssignmentStatement(
+                                                                                new Identifier("id", 4, 4),
+                                                                                new AddExpression(
+                                                                                        new IntegerLiteral(5, 4, 9),
+                                                                                        new MultiplyExpression(
+                                                                                                new IntegerLiteral(4, 4, 13),
+                                                                                                new IntegerLiteral(3, 4, 17),
+                                                                                                4,
+                                                                                                15
+                                                                                        ),
+                                                                                        4,
+                                                                                        11
+                                                                                ),
+                                                                                4,
+                                                                                4
+                                                                        )
+                                                                );
+                                                                add(
+                                                                        new ArrayAssignment(
+                                                                                new Identifier("id", 5, 4),
+                                                                                new IntegerLiteral(3, 5, 7),
+                                                                                new AddExpression(
+                                                                                        new MultiplyExpression(
+                                                                                                new IntegerLiteral(5, 5, 12),
+                                                                                                new IntegerLiteral(4, 5, 16),
+                                                                                                5,
+                                                                                                14
+                                                                                        ),
+                                                                                        new IntegerLiteral(3, 5, 20),
+                                                                                        5,
+                                                                                        18
+                                                                                ),
+                                                                                5,
+                                                                                4
+                                                                        )
+                                                                );
+                                                            }},
+                                                            2,
+                                                            0
+                                                    ),
+                                                    2,
+                                                    0
+                                            ),
+                                            1,
+                                            0
+                                    )
+                            );
+                        }},
+                        1,
+                        0
+                ),
+                1,
+                0
+        );
+
+        assertEquals(expected, program);
     }
 
 }

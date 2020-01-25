@@ -4,7 +4,9 @@ import java.util.Objects;
 
 public class ArrayType extends TypeNode {
 
-    public ArrayType(Type type, IntegerLiteral constant) {
+    public ArrayType(Type type, IntegerLiteral constant,
+                     int lineNumber, int linePosition) {
+        super(lineNumber, linePosition);
         assert type != null;
         assert constant != null;
 
@@ -35,7 +37,8 @@ public class ArrayType extends TypeNode {
         }
         if (other instanceof ArrayType) {
             final ArrayType known = (ArrayType) other;
-            return Objects.equals(mType, known.mType)
+            return super.equals(known)
+                    && Objects.equals(mType, known.mType)
                     && Objects.equals(mSize, known.mSize);
         }
         return false;
@@ -43,7 +46,7 @@ public class ArrayType extends TypeNode {
 
     @Override
     public int hashCode() {
-        return Objects.hash(mType, mSize);
+        return Objects.hash(super.hashCode(), mType, mSize);
     }
 
 }

@@ -4,7 +4,9 @@ import java.util.Objects;
 
 public class FunctionCall extends Expression {
 
-    public FunctionCall(Identifier id, ExpressionList expressions) {
+    public FunctionCall(Identifier id, ExpressionList expressions,
+                        int lineNumber, int linePosition) {
+        super(lineNumber, linePosition);
         assert id != null;
         assert expressions != null;
 
@@ -35,7 +37,8 @@ public class FunctionCall extends Expression {
         }
         if (other instanceof FunctionCall) {
             final FunctionCall known = (FunctionCall) other;
-            return Objects.equals(mId, known.mId)
+            return super.equals(known)
+                    && Objects.equals(mId, known.mId)
                     && Objects.equals(mExpressions, known.mExpressions);
         }
         return false;
@@ -43,7 +46,7 @@ public class FunctionCall extends Expression {
 
     @Override
     public int hashCode() {
-        return Objects.hash(mId, mExpressions);
+        return Objects.hash(super.hashCode(), mId, mExpressions);
     }
 
 }

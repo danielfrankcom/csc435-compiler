@@ -2,8 +2,9 @@ package om.frankc.csc435.compiler.ast;
 
 public class LessThanExpression extends OperatorExpression {
 
-    public LessThanExpression(Expression leftSide, Expression rightSide) {
-        super(leftSide, rightSide);
+    public LessThanExpression(Expression leftSide, Expression rightSide,
+                              int lineNumber, int linePosition) {
+        super(leftSide, rightSide, lineNumber, linePosition);
     }
 
     @Override

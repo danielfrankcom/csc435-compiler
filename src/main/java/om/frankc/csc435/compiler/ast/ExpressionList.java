@@ -4,8 +4,9 @@ import java.util.List;
 
 public class ExpressionList extends NodeList<Expression> {
 
-    public ExpressionList(List<Expression> elements) {
-        super(elements);
+    public ExpressionList(List<Expression> elements,
+                          int lineNumber, int linePosition) {
+        super(elements, lineNumber, linePosition);
     }
 
     @Override

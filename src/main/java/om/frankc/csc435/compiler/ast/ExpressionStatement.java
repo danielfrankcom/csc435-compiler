@@ -4,7 +4,9 @@ import java.util.Objects;
 
 public class ExpressionStatement extends Statement {
 
-    public ExpressionStatement(Expression expression) {
+    public ExpressionStatement(Expression expression,
+                               int lineNumber, int linePosition) {
+        super(lineNumber, linePosition);
         assert expression != null;
         mExpression = expression;
     }
@@ -27,14 +29,15 @@ public class ExpressionStatement extends Statement {
         }
         if (other instanceof ExpressionStatement) {
             final ExpressionStatement known = (ExpressionStatement) other;
-            return Objects.equals(mExpression, known.mExpression);
+            return super.equals(known)
+                    && Objects.equals(mExpression, known.mExpression);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(mExpression);
+        return Objects.hash(super.hashCode(), mExpression);
     }
 
 }

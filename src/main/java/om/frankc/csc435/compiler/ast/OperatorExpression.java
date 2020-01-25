@@ -4,7 +4,9 @@ import java.util.Objects;
 
 public abstract class OperatorExpression extends Expression {
 
-    public OperatorExpression(Expression leftSide, Expression rightSide) {
+    public OperatorExpression(Expression leftSide, Expression rightSide,
+                              int lineNumber, int linePosition) {
+        super(lineNumber, linePosition);
         assert leftSide != null;
         assert rightSide != null;
 
@@ -30,7 +32,8 @@ public abstract class OperatorExpression extends Expression {
         }
         if (other instanceof OperatorExpression) {
             final OperatorExpression known = (OperatorExpression) other;
-            return Objects.equals(mLeftSide, known.mLeftSide)
+            return super.equals(known)
+                    && Objects.equals(mLeftSide, known.mLeftSide)
                     && Objects.equals(mRightSide, known.mRightSide);
         }
         return false;
@@ -38,7 +41,7 @@ public abstract class OperatorExpression extends Expression {
 
     @Override
     public int hashCode() {
-        return Objects.hash(mLeftSide, mRightSide);
+        return Objects.hash(super.hashCode(), mLeftSide, mRightSide);
     }
 
 }

@@ -4,7 +4,9 @@ import java.util.Objects;
 
 public class PrintLineStatement extends Statement {
 
-    public PrintLineStatement(Expression expression) {
+    public PrintLineStatement(Expression expression,
+                              int lineNumber, int linePosition) {
+        super(lineNumber, linePosition);
         assert expression != null;
         mExpression = expression;
     }
@@ -27,14 +29,15 @@ public class PrintLineStatement extends Statement {
         }
         if (other instanceof PrintLineStatement) {
             final PrintLineStatement known = (PrintLineStatement) other;
-            return Objects.equals(mExpression, known.mExpression);
+            return super.equals(known)
+                    && Objects.equals(mExpression, known.mExpression);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(mExpression);
+        return Objects.hash(super.hashCode(), mExpression);
     }
 
 }

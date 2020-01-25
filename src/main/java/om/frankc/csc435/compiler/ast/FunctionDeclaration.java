@@ -4,7 +4,9 @@ import java.util.Objects;
 
 public class FunctionDeclaration extends AstNode {
 
-    public FunctionDeclaration(TypeNode typeNode, Identifier id, FormalParameterList paramList) {
+    public FunctionDeclaration(TypeNode typeNode, Identifier id, FormalParameterList paramList,
+                               int lineNumber, int linePosition) {
+        super(lineNumber, linePosition);
         assert id != null;
         assert typeNode != null;
         assert paramList != null;
@@ -42,7 +44,8 @@ public class FunctionDeclaration extends AstNode {
         }
         if (other instanceof FunctionDeclaration) {
             final FunctionDeclaration known = (FunctionDeclaration) other;
-            return Objects.equals(mTypeNode, known.mTypeNode)
+            return super.equals(known)
+                    && Objects.equals(mTypeNode, known.mTypeNode)
                     && Objects.equals(mId, known.mId)
                     && Objects.equals(mParamList, known.mParamList);
         }
@@ -51,7 +54,7 @@ public class FunctionDeclaration extends AstNode {
 
     @Override
     public int hashCode() {
-        return Objects.hash(mTypeNode, mId, mParamList);
+        return Objects.hash(super.hashCode(), mTypeNode, mId, mParamList);
     }
 
 }

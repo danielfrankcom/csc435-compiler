@@ -4,7 +4,9 @@ import java.util.Objects;
 
 public class ParenExpression extends Expression {
 
-    public ParenExpression(Expression expression) {
+    public ParenExpression(Expression expression,
+                           int lineNumber, int linePosition) {
+        super(lineNumber, linePosition);
         assert expression != null;
         mExpression = expression;
     }
@@ -27,14 +29,15 @@ public class ParenExpression extends Expression {
         }
         if (other instanceof ParenExpression) {
             final ParenExpression known = (ParenExpression) other;
-            return Objects.equals(mExpression, known.mExpression);
+            return super.equals(known)
+                    && Objects.equals(mExpression, known.mExpression);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(mExpression);
+        return Objects.hash(super.hashCode(), mExpression);
     }
 
 }

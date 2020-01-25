@@ -10,7 +10,9 @@ import java.util.Objects;
  */
 public class Program extends AstNode {
 
-    public Program(FunctionList functions) {
+    public Program(FunctionList functions,
+                   int lineNumber, int linePosition) {
+        super(lineNumber, linePosition);
         assert functions != null;
         mFunctions = functions;
     }
@@ -33,14 +35,15 @@ public class Program extends AstNode {
         }
         if (other instanceof Program) {
             final Program known = (Program) other;
-            return Objects.equals(mFunctions, known.mFunctions);
+            return super.equals(known)
+                    && Objects.equals(mFunctions, known.mFunctions);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(mFunctions);
+        return Objects.hash(super.hashCode(), mFunctions);
     }
 
 }

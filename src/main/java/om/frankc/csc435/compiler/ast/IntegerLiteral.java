@@ -4,7 +4,9 @@ import java.util.Objects;
 
 public class IntegerLiteral extends Literal {
 
-    public IntegerLiteral(int value) {
+    public IntegerLiteral(int value,
+                          int lineNumber, int linePosition) {
+        super(lineNumber, linePosition);
         assert value >= 0;
         mValue = value;
     }
@@ -27,14 +29,15 @@ public class IntegerLiteral extends Literal {
         }
         if (other instanceof IntegerLiteral) {
             final IntegerLiteral known = (IntegerLiteral) other;
-            return Objects.equals(mValue, known.mValue);
+            return super.equals(known)
+                    && Objects.equals(mValue, known.mValue);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(mValue);
+        return Objects.hash(super.hashCode(), mValue);
     }
 
 }

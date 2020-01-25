@@ -4,8 +4,9 @@ import java.util.Objects;
 
 public class IfElseStatement extends IfStatement {
 
-    public IfElseStatement(Expression expression, Block ifBlock, Block elseBlock) {
-        super(expression, ifBlock);
+    public IfElseStatement(Expression expression, Block ifBlock, Block elseBlock,
+                           int lineNumber, int linePosition) {
+        super(expression, ifBlock, lineNumber, linePosition);
         assert elseBlock != null;
 
         mElseBlock = elseBlock;
@@ -29,7 +30,8 @@ public class IfElseStatement extends IfStatement {
         }
         if (other instanceof IfElseStatement) {
             final IfElseStatement known = (IfElseStatement) other;
-            return Objects.equals(getExpression(), known.getExpression())
+            return super.equals(known)
+                    && Objects.equals(getExpression(), known.getExpression())
                     && Objects.equals(getIfBlock(), known.getIfBlock())
                     && Objects.equals(getElseBlock(), known.getElseBlock());
         }
@@ -38,7 +40,7 @@ public class IfElseStatement extends IfStatement {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getExpression(), getIfBlock(), getElseBlock());
+        return Objects.hash(super.hashCode(), getExpression(), getIfBlock(), getElseBlock());
     }
 
 }

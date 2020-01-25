@@ -60,7 +60,7 @@ options {
 program returns [Program program]
 : f=functions EOF
 {
-    program = new Program(f);
+    program = new Program(f, f.getLineNumber(), f.getLinePosition());
 };
 
 functions returns [FunctionList fns]
@@ -73,32 +73,34 @@ functions returns [FunctionList fns]
         }
     )+
 {
-    fns = new FunctionList(functions);
+    assert functions.size() > 0;
+    final Function first = functions.get(0);
+    fns = new FunctionList(functions, first.getLineNumber(), first.getLinePosition());
 };
 
 function returns [Function function]
 : declaration=functionDecl body=functionBody
 {
-    function = new Function(declaration, body);
+    function = new Function(declaration, body, declaration.getLineNumber(), declaration.getLinePosition());
 };
 
 functionDecl returns [FunctionDeclaration declaration]
-: t=compoundType i=id OPEN_PAREN params=formalParameters CLOSE_PAREN
+: t=compoundType i=id pre=OPEN_PAREN params=formalParameters[pre] CLOSE_PAREN
 {
-    declaration = new FunctionDeclaration(t, i, params);
+    declaration = new FunctionDeclaration(t, i, params, t.getLineNumber(), t.getLinePosition());
 };
 
-formalParameters returns [FormalParameterList paramList]
+formalParameters [Token precursor] returns [FormalParameterList paramList]
 : t=compoundType i=id params=moreFormals
 {
-    final FormalParameter firstParam = new FormalParameter(t, i);
+    final FormalParameter firstParam = new FormalParameter(t, i, t.getLineNumber(), t.getLinePosition());
     params.add(0, firstParam);
-    paramList = new FormalParameterList(params);
+    paramList = new FormalParameterList(params, precursor.getLine(), precursor.getCharPositionInLine());
 }
 | // epsilon.
 {
     params = Collections.emptyList();
-    paramList = new FormalParameterList(params);
+    paramList = new FormalParameterList(params, precursor.getLine(), precursor.getCharPositionInLine());
 };
 
 moreFormals returns [List<FormalParameter> parameters]
@@ -115,16 +117,16 @@ moreFormals returns [List<FormalParameter> parameters]
 formalParameter returns [FormalParameter parameter]
 : t=compoundType i=id
 {
-    parameter = new FormalParameter(t, i);
+    parameter = new FormalParameter(t, i, t.getLineNumber(), t.getLinePosition());
 };
 
 functionBody returns [FunctionBody body]
-: OPEN_BRACE decls=varDecls stmts=statements CLOSE_BRACE
+: pre=OPEN_BRACE decls=varDecls[pre] stmts=statements[pre] CLOSE_BRACE
 {
-    body = new FunctionBody(decls, stmts);
+    body = new FunctionBody(decls, stmts, $pre.line, $pre.pos);
 };
 
-varDecls returns [VariableDeclarationList declList]
+varDecls [Token precursor] returns [VariableDeclarationList declList]
     @init {
         final List<VariableDeclaration> declarations = new LinkedList<>();
     }
@@ -134,10 +136,10 @@ varDecls returns [VariableDeclarationList declList]
         }
     )*
 {
-    declList = new VariableDeclarationList(declarations);
+    declList = new VariableDeclarationList(declarations, precursor.getLine(), precursor.getCharPositionInLine());
 };
 
-statements returns [StatementList stmts]
+statements [Token precursor] returns [StatementList stmts]
     @init {
         final List<Statement> statements = new LinkedList<>();
     }
@@ -151,7 +153,7 @@ statements returns [StatementList stmts]
         }
     )*
 {
-    stmts = new StatementList(statements);
+    stmts = new StatementList(statements, precursor.getLine(), precursor.getCharPositionInLine());
 };
 
 compoundType returns [TypeNode type]
@@ -161,39 +163,39 @@ compoundType returns [TypeNode type]
 }
 | t=type OPEN_BRACKET constant=intLiteral CLOSE_BRACKET
 {
-    type = new ArrayType(t, constant);
+    type = new ArrayType(t, constant, t.getLineNumber(), t.getLinePosition());
 };
 
 type returns [Type type]
-: INT
+: i=INT
 {
-    type = Type.INT;
+    type = new Type(Type.Name.Integer, $i.line, $i.pos);
 }
-| FLOAT
+| f=FLOAT
 {
-    type = Type.FLOAT;
+    type = new Type(Type.Name.FloatingPoint, $f.line, $f.pos);
 }
-| CHAR
+| c=CHAR
 {
-    type = Type.CHAR;
+    type = new Type(Type.Name.Character, $c.line, $c.pos);
 }
-| STRING
+| s=STRING
 {
-    type = Type.STRING;
+    type = new Type(Type.Name.String, $s.line, $s.pos);
 }
-| BOOLEAN
+| b=BOOLEAN
 {
-    type = Type.BOOLEAN;
+    type = new Type(Type.Name.Boolean, $b.line, $b.pos);
 }
-| VOID
+| v=VOID
 {
-    type = Type.VOID;
+    type = new Type(Type.Name.Void, $v.line, $v.pos);
 };
 
 varDecl returns [VariableDeclaration declaration]
 : t=compoundType i=id SEMICOLON
 {
-    declaration = new VariableDeclaration(t, i);
+    declaration = new VariableDeclaration(t, i, t.getLineNumber(), t.getLinePosition());
 };
 
 statement returns [Statement statement]
@@ -234,61 +236,61 @@ statement returns [Statement statement]
 exprStatement returns [ExpressionStatement statement]
 : e=expr SEMICOLON
 {
-    statement = new ExpressionStatement(e);
+    statement = new ExpressionStatement(e, e.getLineNumber(), e.getLinePosition());
 };
 
 ifElseStatement returns [IfStatement statement]
-: IF OPEN_PAREN e=expr CLOSE_PAREN bIf=block (ELSE bElse=block)?
+: start=IF OPEN_PAREN e=expr CLOSE_PAREN bIf=block (ELSE bElse=block)?
 {
     if (bElse == null) {
-        statement = new IfStatement(e, bIf);
+        statement = new IfStatement(e, bIf, $start.line, $start.pos);
     } else {
-        statement = new IfElseStatement(e, bIf, bElse);
+        statement = new IfElseStatement(e, bIf, bElse, $start.line, $start.pos);
     }
 };
 
 whileStatement returns [WhileStatement statement]
-: WHILE OPEN_PAREN e=expr CLOSE_PAREN b=block
+: start=WHILE OPEN_PAREN e=expr CLOSE_PAREN b=block
 {
-    statement = new WhileStatement(e, b);
+    statement = new WhileStatement(e, b, $start.line, $start.pos);
 };
 
 printStatement returns [PrintStatement statement]
-: PRINT e=expr SEMICOLON
+: start=PRINT e=expr SEMICOLON
 {
-    statement = new PrintStatement(e);
+    statement = new PrintStatement(e, $start.line, $start.pos);
 };
 
 printLineStatement returns [PrintLineStatement statement]
-: PRINTLN e=expr SEMICOLON
+: start=PRINTLN e=expr SEMICOLON
 {
-    statement = new PrintLineStatement(e);
+    statement = new PrintLineStatement(e, $start.line, $start.pos);
 };
 
 returnStatement returns [ReturnStatement statement]
-: RETURN (e=expr)? SEMICOLON
+: start=RETURN (e=expr)? SEMICOLON
 {
     final Optional<Expression> optional =
             (e == null) ? Optional.empty(): Optional.of(e);
-    statement = new ReturnStatement(optional);
+    statement = new ReturnStatement(optional, $start.line, $start.pos);
 };
 
 assignmentStatement returns [AssignmentStatement statement]
 : i=id EQUALS e=expr SEMICOLON
 {
-    statement = new AssignmentStatement(i, e);
+    statement = new AssignmentStatement(i, e, i.getLineNumber(), i.getLinePosition());
 };
 
 arrayAssignment returns [ArrayAssignment assignment]
 : i=id OPEN_BRACKET index=expr CLOSE_BRACKET EQUALS assign=expr SEMICOLON
 {
-    assignment = new ArrayAssignment(i, index, assign);
+    assignment = new ArrayAssignment(i, index, assign, i.getLineNumber(), i.getLinePosition());
 };
 
 block returns [Block block]
-: OPEN_BRACE s=statements CLOSE_BRACE
+: start=OPEN_BRACE s=statements[start] CLOSE_BRACE
 {
-    block = new Block(s);
+    block = new Block(s, $start.line, $start.pos);
 };
 
 expr returns [Expression expression]
@@ -299,9 +301,9 @@ expr returns [Expression expression]
 
 equality returns [Expression expression]
 :   current=lessThan
-    (EQUAL_OP e2=lessThan
+    (op=EQUAL_OP e2=lessThan
         {
-            current = new EqualityExpression(current, e2);
+            current = new EqualityExpression(current, e2, $op.line, $op.pos);
         }
     )*
 {
@@ -310,9 +312,9 @@ equality returns [Expression expression]
 
 lessThan returns [Expression expression]
 :   current=sum
-    (LESS_OP e2=sum
+    (op=LESS_OP e2=sum
         {
-            current = new LessThanExpression(current, e2);
+            current = new LessThanExpression(current, e2, $op.line, $op.pos);
         }
     )*
 {
@@ -321,9 +323,9 @@ lessThan returns [Expression expression]
 
 sum returns [Expression expression]
 :   current=sub
-    (ADD_OP e2=sub
+    (op=ADD_OP e2=sub
         {
-            current = new AddExpression(current, e2);
+            current = new AddExpression(current, e2, $op.line, $op.pos);
         }
     )*
 {
@@ -332,9 +334,9 @@ sum returns [Expression expression]
 
 sub returns [Expression expression]
 :   current=mult
-    (SUB_OP e2=mult
+    (op=SUB_OP e2=mult
         {
-            current = new SubtractExpression(current, e2);
+            current = new SubtractExpression(current, e2, $op.line, $op.pos);
         }
     )*
 {
@@ -343,9 +345,9 @@ sub returns [Expression expression]
 
 mult returns [Expression expression]
 :   current=atom
-    (MULT_OP e2=atom
+    (op=MULT_OP e2=atom
         {
-            current = new MultiplyExpression(current, e2);
+            current = new MultiplyExpression(current, e2, $op.line, $op.pos);
         }
     )*
 {
@@ -400,21 +402,21 @@ stringLiteral returns [StringLiteral literal]
 : constant=STRING_CONSTANT
 {
     final String value = constant.getText();
-    literal = new StringLiteral(value);
+    literal = new StringLiteral(value, $constant.line, $constant.pos);
 };
 
 intLiteral returns [IntegerLiteral literal]
 : constant=INT_CONSTANT
 {
     final int value = Integer.parseInt(constant.getText());
-    literal = new IntegerLiteral(value);
+    literal = new IntegerLiteral(value, $constant.line, $constant.pos);
 };
 
 floatLiteral returns [FloatLiteral literal]
 : constant=FLOAT_CONSTANT
 {
     final float value = Float.parseFloat(constant.getText());
-    literal = new FloatLiteral(value);
+    literal = new FloatLiteral(value, $constant.line, $constant.pos);
 };
 
 charLiteral returns [CharacterLiteral literal]
@@ -423,51 +425,51 @@ charLiteral returns [CharacterLiteral literal]
     final String text = constant.getText();
     assert text.length() == 3; // Account for quotes.
     final char value = text.charAt(1);
-    literal = new CharacterLiteral(value);
+    literal = new CharacterLiteral(value, $constant.line, $constant.pos);
 };
 
 booleanLiteral returns [BooleanLiteral literal]
 : constant=BOOLEAN_CONSTANT
 {
     final boolean value = Boolean.parseBoolean(constant.getText());
-    literal = new BooleanLiteral(value);
+    literal = new BooleanLiteral(value, $constant.line, $constant.pos);
 };
 
 id returns [Identifier id]
 : i=ID
 {
     final String text = i.getText();
-    id = new Identifier(text);
+    id = new Identifier(text, $i.line, $i.pos);
 };
 
 parenExpr returns [ParenExpression expression]
-: OPEN_PAREN e=expr CLOSE_PAREN
+: start=OPEN_PAREN e=expr CLOSE_PAREN
 {
-    expression = new ParenExpression(e);
+    expression = new ParenExpression(e, $start.line, $start.pos);
 };
 
 arrayReference returns [ArrayReference reference]
 : i=id OPEN_BRACKET e=expr CLOSE_BRACKET
 {
-    reference = new ArrayReference(i, e);
+    reference = new ArrayReference(i, e, i.getLineNumber(), i.getLinePosition());
 };
 
 functionCall returns [FunctionCall functionCall]
-: i=id OPEN_PAREN e=exprList CLOSE_PAREN
+: i=id pre=OPEN_PAREN e=exprList[pre] CLOSE_PAREN
 {
-    functionCall = new FunctionCall(i, e);
+    functionCall = new FunctionCall(i, e, i.getLineNumber(), i.getLinePosition());
 };
 
-exprList returns [ExpressionList exprList]
+exprList [Token precursor] returns [ExpressionList exprList]
 : e=expr expressions=exprMore
 {
     expressions.add(0, e);
-    exprList = new ExpressionList(expressions);
+    exprList = new ExpressionList(expressions, precursor.getLine(), precursor.getCharPositionInLine());
 }
 | // epsilon.
 {
     expressions = Collections.emptyList();
-    exprList = new ExpressionList(expressions);
+    exprList = new ExpressionList(expressions, precursor.getLine(), precursor.getCharPositionInLine());
 };
 
 exprMore returns [List<Expression> expressions]

@@ -4,8 +4,9 @@ import java.util.List;
 
 public class StatementList extends NodeList<Statement> {
 
-    public StatementList(List<Statement> statements) {
-        super(statements);
+    public StatementList(List<Statement> statements,
+                         int lineNumber, int linePosition) {
+        super(statements, lineNumber, linePosition);
     }
 
     @Override

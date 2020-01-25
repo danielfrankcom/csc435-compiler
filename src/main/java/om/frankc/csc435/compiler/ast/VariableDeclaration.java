@@ -4,7 +4,9 @@ import java.util.Objects;
 
 public class VariableDeclaration extends AstNode {
 
-    public VariableDeclaration(TypeNode typeNode, Identifier id) {
+    public VariableDeclaration(TypeNode typeNode, Identifier id,
+                               int lineNumber, int linePosition) {
+        super(lineNumber, linePosition);
         assert typeNode != null;
         assert id != null;
 
@@ -35,7 +37,8 @@ public class VariableDeclaration extends AstNode {
         }
         if (other instanceof VariableDeclaration) {
             final VariableDeclaration known = (VariableDeclaration) other;
-            return Objects.equals(mTypeNode, known.mTypeNode)
+            return super.equals(known)
+                    && Objects.equals(mTypeNode, known.mTypeNode)
                     && Objects.equals(mId, known.mId);
         }
         return false;
@@ -43,7 +46,7 @@ public class VariableDeclaration extends AstNode {
 
     @Override
     public int hashCode() {
-        return Objects.hash(mTypeNode, mId);
+        return Objects.hash(super.hashCode(), mTypeNode, mId);
     }
 
 }

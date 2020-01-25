@@ -4,7 +4,9 @@ import java.util.Objects;
 
 public class Identifier extends Expression {
 
-    public Identifier(String text) {
+    public Identifier(String text,
+                      int lineNumber, int linePosition) {
+        super(lineNumber, linePosition);
         assert text != null;
         mText = text;
     }
@@ -27,14 +29,15 @@ public class Identifier extends Expression {
         }
         if (other instanceof Identifier) {
             final Identifier known = (Identifier) other;
-            return Objects.equals(mText, known.mText);
+            return super.equals(known)
+                    && Objects.equals(mText, known.mText);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(mText);
+        return Objects.hash(super.hashCode(), mText);
     }
 
 }

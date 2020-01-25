@@ -4,7 +4,9 @@ import java.util.Objects;
 
 public class ArrayReference extends Expression {
 
-    public ArrayReference(Identifier id, Expression expression) {
+    public ArrayReference(Identifier id, Expression expression,
+                          int lineNumber, int linePosition) {
+        super(lineNumber, linePosition);
         assert id != null;
         assert expression != null;
 
@@ -35,7 +37,8 @@ public class ArrayReference extends Expression {
         }
         if (other instanceof ArrayReference) {
             final ArrayReference known = (ArrayReference) other;
-            return Objects.equals(mId, known.mId)
+            return super.equals(known)
+                    && Objects.equals(mId, known.mId)
                     && Objects.equals(mExpression, known.mExpression);
         }
         return false;
@@ -43,7 +46,7 @@ public class ArrayReference extends Expression {
 
     @Override
     public int hashCode() {
-        return Objects.hash(mId, mExpression);
+        return Objects.hash(super.hashCode(), mId, mExpression);
     }
 
 }

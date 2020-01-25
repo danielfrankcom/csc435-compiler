@@ -31,8 +31,8 @@ public class Compiler {
 
         final ANTLRInputStream input = new ANTLRInputStream(new FileInputStream(args[0]));
 
-        // The name of the grammar here is "ulNoActions",
-        // so ANTLR generates ulNoActionsLexer and ulNoActionsParser
+        // The name of the grammar here is "Csc435",
+        // so ANTLR generates Csc435Lexer and Csc435Parser
         final Csc435Lexer lexer = new Csc435Lexer(input);
         final CommonTokenStream tokens = new CommonTokenStream(lexer);
         final Csc435Parser parser = new Csc435Parser(tokens);
