@@ -8,6 +8,21 @@ public class PrettyPrintAstVisitor implements IAstVisitor {
 
     private static final int INDENTATION_SPACES = 4;
 
+    /**
+     * Repeat the provided {@link String} the provided number of times.
+     *
+     * @param string The {@link String} to repeat.
+     * @param times  The number of times to repeat it.
+     * @return The generated {@link String}.
+     */
+    private static String repeat(String string, int times) {
+        final StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < times; i++) {
+            builder.append(string);
+        }
+        return builder.toString();
+    }
+
     public PrettyPrintAstVisitor(Consumer<String> output) {
         assert output != null;
         mOutput = output;
@@ -55,7 +70,7 @@ public class PrettyPrintAstVisitor implements IAstVisitor {
         // has no content.
         if (currentLine.length() > 0) {
             final int spaces = mIndentationLevel * INDENTATION_SPACES;
-            final String indent = " ".repeat(spaces);
+            final String indent = repeat(" ", spaces);
             currentLine = indent + currentLine;
         }
 

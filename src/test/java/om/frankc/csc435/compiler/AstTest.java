@@ -171,7 +171,7 @@ public class AstTest {
 
         final Program expected = new Program(
                 new FunctionList(
-                        new ArrayList<>() {{
+                        new ArrayList<Function>() {{
                             add(
                                     new Function(
                                             new FunctionDeclaration(
@@ -184,7 +184,7 @@ public class AstTest {
                                             new FunctionBody(
                                                     new VariableDeclarationList(Collections.emptyList(), 2, 0),
                                                     new StatementList(
-                                                            new ArrayList<>() {{
+                                                            new ArrayList<Statement>() {{
                                                                 add(
                                                                         new ArrayAssignment(
                                                                                 new Identifier("id", 3, 4),

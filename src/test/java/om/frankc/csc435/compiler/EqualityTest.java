@@ -63,7 +63,7 @@ public class EqualityTest {
     public void testProgramEquality() {
         final AstNode program1 = new Program(
                 new FunctionList(
-                        new ArrayList<>() {{
+                        new ArrayList<Function>() {{
                             add(new Function(
                                             new FunctionDeclaration(
                                                     new Type(Type.Name.Boolean, 1, 0),
@@ -74,7 +74,7 @@ public class EqualityTest {
                                             ),
                                             new FunctionBody(
                                                     new VariableDeclarationList(
-                                                            new ArrayList<>() {{
+                                                            new ArrayList<VariableDeclaration>() {{
                                                                 add(new VariableDeclaration(
                                                                                 new Type(Type.Name.Integer, 5, 0),
                                                                                 new Identifier("variable", 1, 0),
@@ -102,7 +102,7 @@ public class EqualityTest {
         );
         final AstNode program2 = new Program(
                 new FunctionList(
-                        new ArrayList<>() {{
+                        new ArrayList<Function>() {{
                             add(new Function(
                                             new FunctionDeclaration(
                                                     new Type(Type.Name.Boolean, 1, 0),
@@ -113,7 +113,7 @@ public class EqualityTest {
                                             ),
                                             new FunctionBody(
                                                     new VariableDeclarationList(
-                                                            new ArrayList<>() {{
+                                                            new ArrayList<VariableDeclaration>() {{
                                                                 add(new VariableDeclaration(
                                                                                 new Type(Type.Name.Integer, 5, 0),
                                                                                 new Identifier("variable", 1, 0),
@@ -147,7 +147,7 @@ public class EqualityTest {
         assertObjectsNotEqual(
                 new Program(
                         new FunctionList(
-                                new ArrayList<>() {{
+                                new ArrayList<Function>() {{
                                     add(new Function(
                                                     new FunctionDeclaration(
                                                             new Type(Type.Name.Boolean, 1, 0),
@@ -158,7 +158,7 @@ public class EqualityTest {
                                                     ),
                                                     new FunctionBody(
                                                             new VariableDeclarationList(
-                                                                    new ArrayList<>() {{
+                                                                    new ArrayList<VariableDeclaration>() {{
                                                                         add(new VariableDeclaration(
                                                                                         new Type(Type.Name.Integer, 5, 0),
                                                                                         new Identifier("variable", 1, 0),
@@ -186,7 +186,7 @@ public class EqualityTest {
                 ),
                 new Program(
                         new FunctionList(
-                                new ArrayList<>() {{
+                                new ArrayList<Function>() {{
                                     add(new Function(
                                                     new FunctionDeclaration(
                                                             new Type(Type.Name.Boolean, 1, 0),
@@ -197,7 +197,7 @@ public class EqualityTest {
                                                     ),
                                                     new FunctionBody(
                                                             new VariableDeclarationList(
-                                                                    new ArrayList<>() {{
+                                                                    new ArrayList<VariableDeclaration>() {{
                                                                         add(new VariableDeclaration(
                                                                                         new Type(Type.Name.Integer, 5, 0),
                                                                                         new Identifier("variables", 1, 0),
@@ -225,7 +225,7 @@ public class EqualityTest {
                 ),
                 new Program(
                         new FunctionList(
-                                new ArrayList<>() {{
+                                new ArrayList<Function>() {{
                                     add(new Function(
                                                     new FunctionDeclaration(
                                                             new Type(Type.Name.Boolean, 1, 0),
@@ -236,7 +236,7 @@ public class EqualityTest {
                                                     ),
                                                     new FunctionBody(
                                                             new VariableDeclarationList(
-                                                                    new ArrayList<>() {{
+                                                                    new ArrayList<VariableDeclaration>() {{
                                                                         add(new VariableDeclaration(
                                                                                         new Type(Type.Name.Integer, 5, 0),
                                                                                         new Identifier("variable", 1, 0),
@@ -264,7 +264,7 @@ public class EqualityTest {
                 ),
                 new Program(
                         new FunctionList(
-                                new ArrayList<>() {{
+                                new ArrayList<Function>() {{
                                     add(new Function(
                                                     new FunctionDeclaration(
                                                             new Type(Type.Name.Void, 1, 0),
@@ -275,7 +275,7 @@ public class EqualityTest {
                                                     ),
                                                     new FunctionBody(
                                                             new VariableDeclarationList(
-                                                                    new ArrayList<>() {{
+                                                                    new ArrayList<VariableDeclaration>() {{
                                                                         add(new VariableDeclaration(
                                                                                         new Type(Type.Name.Integer, 5, 0),
                                                                                         new Identifier("variable", 1, 0),
@@ -303,7 +303,7 @@ public class EqualityTest {
                 ),
                 new Program(
                         new FunctionList(
-                                new ArrayList<>() {{
+                                new ArrayList<Function>() {{
                                     add(new Function(
                                                     new FunctionDeclaration(
                                                             new Type(Type.Name.Void, 1, 0),
@@ -314,7 +314,7 @@ public class EqualityTest {
                                                     ),
                                                     new FunctionBody(
                                                             new VariableDeclarationList(
-                                                                    new ArrayList<>() {{
+                                                                    new ArrayList<VariableDeclaration>() {{
                                                                         add(new VariableDeclaration(
                                                                                         new Type(Type.Name.Integer, 5, 0),
                                                                                         new Identifier("variable", 1, 0),
