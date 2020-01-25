@@ -1,0 +1,49 @@
+#!/bin/bash
+
+set -e
+
+# Reimplements a standard C function that may not
+# exist on MacOS if the markers are using it.
+realpath() {
+    [[ $1 = /* ]] && echo "$1" || echo "$PWD/${1#./}"
+}
+
+USAGE_OUTPUT="Expected command: './compile [input-path] [output-path:optional]'"
+
+INPUT=$1
+
+if [ "$INPUT" == "-h" ] || [ "$INPUT" == "--help" ]; then
+    echo $USAGE_OUTPUT
+    exit 0
+fi
+
+if test ! -f "$INPUT"; then
+    echo "Input file \"$INPUT\" not found"
+    echo $USAGE_OUTPUT
+    exit 1
+fi
+
+OUTPUT=$2
+if test ! -z "$OUTPUT"; then
+    if test ! -f "$OUTPUT"; then
+        # Check that directory exists.
+        touch "$OUTPUT"
+    fi
+fi
+
+SCRIPT_DIR="$( cd "$(dirname "$0")" ; pwd -P )"
+JAR_FILE="$SCRIPT_DIR/build/libs/csc435-compiler.jar"
+
+if test ! -f "$JAR_FILE"; then
+    echo "Jar not found at \"$JAR_FILE\""
+    echo "Recompiling"
+    ( cd $SCRIPT_DIR ; make build )
+fi
+
+if test -z "$OUTPUT"; then
+    java -jar "$JAR_FILE" "$INPUT"
+    echo "Compiled successfully"
+else
+    java -jar "$JAR_FILE" "$INPUT" -p "$OUTPUT"
+    echo "Pretty-printed successfully"
+fi
