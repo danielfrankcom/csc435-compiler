@@ -52,7 +52,7 @@ public class Compiler {
                 }
             };
 
-            final IAstVisitor visitor = new PrettyPrintAstVisitor(output);
+            final IAstVisitor<Void> visitor = new PrettyPrintAstVisitor(output);
             program.accept(visitor);
 
             writer.flush();

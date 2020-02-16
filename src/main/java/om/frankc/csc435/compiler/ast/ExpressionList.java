@@ -12,8 +12,8 @@ public class ExpressionList extends NodeList<Expression> {
     }
 
     @Override
-    public void accept(IAstVisitor visitor) {
-        visitor.visit(this);
+    public <T> T accept(IAstVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 
 }

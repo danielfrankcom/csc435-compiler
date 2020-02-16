@@ -24,7 +24,7 @@ public abstract class AstNode {
         return mLinePosition;
     }
 
-    public abstract void accept(IAstVisitor visitor);
+    public abstract <T> T accept(IAstVisitor<T> visitor);
 
     /**
      * {@inheritDoc}

@@ -22,7 +22,7 @@ public abstract class NodeList<E extends AstNode> extends AstNode {
     }
 
     @Override
-    public abstract void accept(IAstVisitor visitor);
+    public abstract <T> T accept(IAstVisitor<T> visitor);
 
     @Override
     public final boolean equals(Object other) {

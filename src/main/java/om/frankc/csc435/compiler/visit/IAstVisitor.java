@@ -2,80 +2,80 @@ package om.frankc.csc435.compiler.visit;
 
 import om.frankc.csc435.compiler.ast.*;
 
-public interface IAstVisitor {
+public interface IAstVisitor<T> {
 
-    void visit(Program program);
+    T visit(Program program);
 
-    void visit(FunctionList functions);
+    T visit(FunctionList functions);
 
-    void visit(Function function);
+    T visit(Function function);
 
-    void visit(FunctionDeclaration declaration);
+    T visit(FunctionDeclaration declaration);
 
-    void visit(ArrayType arrayType);
+    T visit(ArrayType arrayType);
 
-    void visit(Type type);
+    T visit(Type type);
 
-    void visit(Identifier id);
+    T visit(Identifier id);
 
-    void visit(IntegerLiteral literal);
+    T visit(IntegerLiteral literal);
 
-    void visit(StringLiteral literal);
+    T visit(StringLiteral literal);
 
-    void visit(FloatLiteral literal);
+    T visit(FloatLiteral literal);
 
-    void visit(CharacterLiteral literal);
+    T visit(CharacterLiteral literal);
 
-    void visit(BooleanLiteral literal);
+    T visit(BooleanLiteral literal);
 
-    void visit(FormalParameterList paramList);
+    T visit(FormalParameterList paramList);
 
-    void visit(FormalParameter parameter);
+    T visit(FormalParameter parameter);
 
-    void visit(FunctionBody body);
+    T visit(FunctionBody body);
 
-    void visit(VariableDeclarationList declarations);
+    T visit(VariableDeclarationList declarations);
 
-    void visit(VariableDeclaration declaration);
+    T visit(VariableDeclaration declaration);
 
-    void visit(StatementList statements);
+    T visit(StatementList statements);
 
-    void visit(ExpressionStatement statement);
+    T visit(ExpressionStatement statement);
 
-    void visit(IfStatement statement);
+    T visit(IfStatement statement);
 
-    void visit(IfElseStatement statement);
+    T visit(IfElseStatement statement);
 
-    void visit(WhileStatement statement);
+    T visit(WhileStatement statement);
 
-    void visit(PrintStatement statement);
+    T visit(PrintStatement statement);
 
-    void visit(PrintLineStatement statement);
+    T visit(PrintLineStatement statement);
 
-    void visit(ReturnStatement statement);
+    T visit(ReturnStatement statement);
 
-    void visit(AssignmentStatement statement);
+    T visit(AssignmentStatement statement);
 
-    void visit(ArrayAssignment assignment);
+    T visit(ArrayAssignment assignment);
 
-    void visit(Block block);
+    T visit(Block block);
 
-    void visit(LessThanExpression expression);
+    T visit(LessThanExpression expression);
 
-    void visit(EqualityExpression expression);
+    T visit(EqualityExpression expression);
 
-    void visit(AddExpression expression);
+    T visit(AddExpression expression);
 
-    void visit(SubtractExpression expression);
+    T visit(SubtractExpression expression);
 
-    void visit(MultiplyExpression expression);
+    T visit(MultiplyExpression expression);
 
-    void visit(ParenExpression expression);
+    T visit(ParenExpression expression);
 
-    void visit(ArrayReference reference);
+    T visit(ArrayReference reference);
 
-    void visit(FunctionCall functionCall);
+    T visit(FunctionCall functionCall);
 
-    void visit(ExpressionList expressionList);
+    T visit(ExpressionList expressionList);
 
 }

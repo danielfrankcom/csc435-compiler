@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-public class PrettyPrintAstVisitor implements IAstVisitor {
+public class PrettyPrintAstVisitor implements IAstVisitor<Void> {
 
     private static final int INDENTATION_SPACES = 4;
 
@@ -90,82 +90,106 @@ public class PrettyPrintAstVisitor implements IAstVisitor {
     }
 
     @Override
-    public void visit(Program program) {
+    public Void visit(Program program) {
         program.getFunctions().accept(this);
+
+        return null;
     }
 
     @Override
-    public void visit(FunctionList functions) {
+    public Void visit(FunctionList functions) {
         for (Function function : functions.getElements()) {
             function.accept(this);
             println();
         }
+
+        return null;
     }
 
     @Override
-    public void visit(Function function) {
+    public Void visit(Function function) {
         function.getDeclaration().accept(this);
         println();
         function.getBody().accept(this);
+
+        return null;
     }
 
     @Override
-    public void visit(FunctionDeclaration declaration) {
+    public Void visit(FunctionDeclaration declaration) {
         declaration.getTypeNode().accept(this);
         print(' ');
         declaration.getId().accept(this);
         print(" (");
         declaration.getParamList().accept(this);
         print(')');
+
+        return null;
     }
 
     @Override
-    public void visit(ArrayType arrayType) {
+    public Void visit(ArrayType arrayType) {
         arrayType.getType().accept(this);
         print('[');
         arrayType.getSize().accept(this);
         print(']');
+
+        return null;
     }
 
     @Override
-    public void visit(Type type) {
+    public Void visit(Type type) {
         print(type.getName());
+
+        return null;
     }
 
     @Override
-    public void visit(Identifier id) {
+    public Void visit(Identifier id) {
         print(id.getText());
+
+        return null;
     }
 
     @Override
-    public void visit(IntegerLiteral literal) {
+    public Void visit(IntegerLiteral literal) {
         print(literal.getValue());
+
+        return null;
     }
 
     @Override
-    public void visit(StringLiteral literal) {
+    public Void visit(StringLiteral literal) {
         print(literal.getValue());
+
+        return null;
     }
 
     @Override
-    public void visit(FloatLiteral literal) {
+    public Void visit(FloatLiteral literal) {
         print(literal.getValue());
+
+        return null;
     }
 
     @Override
-    public void visit(CharacterLiteral literal) {
+    public Void visit(CharacterLiteral literal) {
         print('\'');
         print(literal.getValue());
         print('\'');
+
+        return null;
     }
 
     @Override
-    public void visit(BooleanLiteral literal) {
+    public Void visit(BooleanLiteral literal) {
         print(literal.getValue());
+
+        return null;
     }
 
     @Override
-    public void visit(FormalParameterList paramList) {
+    public Void visit(FormalParameterList paramList) {
         final Iterator<FormalParameter> params = paramList.getElements().iterator();
         while (params.hasNext()) {
             final FormalParameter current = params.next();
@@ -175,17 +199,21 @@ public class PrettyPrintAstVisitor implements IAstVisitor {
                 print(", ");
             }
         }
+
+        return null;
     }
 
     @Override
-    public void visit(FormalParameter parameter) {
+    public Void visit(FormalParameter parameter) {
         parameter.getTypeNode().accept(this);
         print(' ');
         parameter.getId().accept(this);
+
+        return null;
     }
 
     @Override
-    public void visit(FunctionBody body) {
+    public Void visit(FunctionBody body) {
         println('{');
         mIndentationLevel++;
 
@@ -198,48 +226,60 @@ public class PrettyPrintAstVisitor implements IAstVisitor {
         body.getStatements().accept(this);
         mIndentationLevel--;
         println('}');
+
+        return null;
     }
 
     @Override
-    public void visit(VariableDeclarationList declarations) {
+    public Void visit(VariableDeclarationList declarations) {
         for (VariableDeclaration current : declarations.getElements()) {
             current.accept(this);
             println();
         }
+
+        return null;
     }
 
     @Override
-    public void visit(VariableDeclaration declaration) {
+    public Void visit(VariableDeclaration declaration) {
         declaration.getTypeNode().accept(this);
         print(' ');
         declaration.getId().accept(this);
         print(';');
+
+        return null;
     }
 
     @Override
-    public void visit(StatementList statements) {
+    public Void visit(StatementList statements) {
         for (Statement current : statements.getElements()) {
             current.accept(this);
             println();
         }
+
+        return null;
     }
 
     @Override
-    public void visit(ExpressionStatement statement) {
+    public Void visit(ExpressionStatement statement) {
         statement.getExpression().accept(this);
         print(';');
+
+        return null;
     }
 
     @Override
-    public void visit(IfStatement statement) {
+    public Void visit(IfStatement statement) {
         print("if (");
         statement.getExpression().accept(this);
         println(')');
         statement.getIfBlock().accept(this);
+
+        return null;
     }
 
     @Override
-    public void visit(IfElseStatement statement) {
+    public Void visit(IfElseStatement statement) {
         print("if (");
         statement.getExpression().accept(this);
         println(')');
@@ -247,32 +287,40 @@ public class PrettyPrintAstVisitor implements IAstVisitor {
         println();
         println("else");
         statement.getElseBlock().accept(this);
+
+        return null;
     }
 
     @Override
-    public void visit(WhileStatement statement) {
+    public Void visit(WhileStatement statement) {
         print("while (");
         statement.getExpression().accept(this);
         println(')');
         statement.getBlock().accept(this);
+
+        return null;
     }
 
     @Override
-    public void visit(PrintStatement statement) {
+    public Void visit(PrintStatement statement) {
         print("print ");
         statement.getExpression().accept(this);
         print(';');
+
+        return null;
     }
 
     @Override
-    public void visit(PrintLineStatement statement) {
+    public Void visit(PrintLineStatement statement) {
         print("println ");
         statement.getExpression().accept(this);
         print(';');
+
+        return null;
     }
 
     @Override
-    public void visit(ReturnStatement statement) {
+    public Void visit(ReturnStatement statement) {
         print("return");
 
         final Optional<Expression> expression = statement.getExpression();
@@ -282,95 +330,119 @@ public class PrettyPrintAstVisitor implements IAstVisitor {
         });
 
         print(';');
+
+        return null;
     }
 
     @Override
-    public void visit(AssignmentStatement statement) {
+    public Void visit(AssignmentStatement statement) {
         statement.getId().accept(this);
         print('=');
         statement.getExpression().accept(this);
         print(';');
+
+        return null;
     }
 
     @Override
-    public void visit(ArrayAssignment assignment) {
+    public Void visit(ArrayAssignment assignment) {
         assignment.getId().accept(this);
         print('[');
         assignment.getIndex().accept(this);
         print("]=");
         assignment.getAssignment().accept(this);
         print(';');
+
+        return null;
     }
 
     @Override
-    public void visit(Block block) {
+    public Void visit(Block block) {
         println('{');
         mIndentationLevel++;
         block.getStatements().accept(this);
         mIndentationLevel--;
         print('}');
+
+        return null;
     }
 
     @Override
-    public void visit(LessThanExpression expression) {
+    public Void visit(LessThanExpression expression) {
         expression.getLeftSide().accept(this);
         print('<');
         expression.getRightSide().accept(this);
+
+        return null;
     }
 
     @Override
-    public void visit(EqualityExpression expression) {
+    public Void visit(EqualityExpression expression) {
         expression.getLeftSide().accept(this);
         print("==");
         expression.getRightSide().accept(this);
+
+        return null;
     }
 
     @Override
-    public void visit(AddExpression expression) {
+    public Void visit(AddExpression expression) {
         expression.getLeftSide().accept(this);
         print('+');
         expression.getRightSide().accept(this);
+
+        return null;
     }
 
     @Override
-    public void visit(SubtractExpression expression) {
+    public Void visit(SubtractExpression expression) {
         expression.getLeftSide().accept(this);
         print('-');
         expression.getRightSide().accept(this);
+
+        return null;
     }
 
     @Override
-    public void visit(MultiplyExpression expression) {
+    public Void visit(MultiplyExpression expression) {
         expression.getLeftSide().accept(this);
         print('*');
         expression.getRightSide().accept(this);
+
+        return null;
     }
 
     @Override
-    public void visit(ParenExpression expression) {
+    public Void visit(ParenExpression expression) {
         print('(');
         expression.getExpression().accept(this);
         print(')');
+
+        return null;
     }
 
     @Override
-    public void visit(ArrayReference reference) {
+    public Void visit(ArrayReference reference) {
         reference.getId().accept(this);
         print('[');
         reference.getExpression().accept(this);
         print(']');
+
+        return null;
     }
 
     @Override
-    public void visit(FunctionCall functionCall) {
+    public Void visit(FunctionCall functionCall) {
         functionCall.getId().accept(this);
         print('(');
         functionCall.getExpressions().accept(this);
         print(')');
+
+        return null;
     }
 
     @Override
-    public void visit(ExpressionList expressionList) {
+    public Void visit(ExpressionList expressionList) {
         final Iterator<Expression> expressions = expressionList.getElements().iterator();
         while (expressions.hasNext()) {
             final Expression current = expressions.next();
@@ -380,6 +452,8 @@ public class PrettyPrintAstVisitor implements IAstVisitor {
                 print(",");
             }
         }
+
+        return null;
     }
 
 }

@@ -20,8 +20,8 @@ public class PrintLineStatement extends Statement {
     }
 
     @Override
-    public void accept(IAstVisitor visitor) {
-        visitor.visit(this);
+    public <T> T accept(IAstVisitor<T> visitor) {
+        return visitor.visit(this);
     }
 
     @Override

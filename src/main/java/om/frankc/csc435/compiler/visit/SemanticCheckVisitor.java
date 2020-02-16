@@ -2,191 +2,191 @@ package om.frankc.csc435.compiler.visit;
 
 import om.frankc.csc435.compiler.ast.*;
 
-public class SemanticCheckVisitor implements IAstVisitor {
+public class SemanticCheckVisitor implements IAstVisitor<TypeNode> {
 
     @Override
-    public void visit(Program program) {
-
+    public TypeNode visit(Program program) {
+        return null;
     }
 
     @Override
-    public void visit(FunctionList functions) {
-
+    public TypeNode visit(FunctionList functions) {
+        return null;
     }
 
     @Override
-    public void visit(Function function) {
-
+    public TypeNode visit(Function function) {
+        return null;
     }
 
     @Override
-    public void visit(FunctionDeclaration declaration) {
-
+    public TypeNode visit(FunctionDeclaration declaration) {
+        return null;
     }
 
     @Override
-    public void visit(ArrayType arrayType) {
-
+    public TypeNode visit(ArrayType arrayType) {
+        return null;
     }
 
     @Override
-    public void visit(Type type) {
-
+    public TypeNode visit(Type type) {
+        return null;
     }
 
     @Override
-    public void visit(Identifier id) {
-
+    public TypeNode visit(Identifier id) {
+        return null;
     }
 
     @Override
-    public void visit(IntegerLiteral literal) {
-
+    public TypeNode visit(IntegerLiteral literal) {
+        return null;
     }
 
     @Override
-    public void visit(StringLiteral literal) {
-
+    public TypeNode visit(StringLiteral literal) {
+        return null;
     }
 
     @Override
-    public void visit(FloatLiteral literal) {
-
+    public TypeNode visit(FloatLiteral literal) {
+        return null;
     }
 
     @Override
-    public void visit(CharacterLiteral literal) {
-
+    public TypeNode visit(CharacterLiteral literal) {
+        return null;
     }
 
     @Override
-    public void visit(BooleanLiteral literal) {
-
+    public TypeNode visit(BooleanLiteral literal) {
+        return null;
     }
 
     @Override
-    public void visit(FormalParameterList paramList) {
-
+    public TypeNode visit(FormalParameterList paramList) {
+        return null;
     }
 
     @Override
-    public void visit(FormalParameter parameter) {
-
+    public TypeNode visit(FormalParameter parameter) {
+        return null;
     }
 
     @Override
-    public void visit(FunctionBody body) {
-
+    public TypeNode visit(FunctionBody body) {
+        return null;
     }
 
     @Override
-    public void visit(VariableDeclarationList declarations) {
-
+    public TypeNode visit(VariableDeclarationList declarations) {
+        return null;
     }
 
     @Override
-    public void visit(VariableDeclaration declaration) {
-
+    public TypeNode visit(VariableDeclaration declaration) {
+        return null;
     }
 
     @Override
-    public void visit(StatementList statements) {
-
+    public TypeNode visit(StatementList statements) {
+        return null;
     }
 
     @Override
-    public void visit(ExpressionStatement statement) {
-
+    public TypeNode visit(ExpressionStatement statement) {
+        return null;
     }
 
     @Override
-    public void visit(IfStatement statement) {
-
+    public TypeNode visit(IfStatement statement) {
+        return null;
     }
 
     @Override
-    public void visit(IfElseStatement statement) {
-
+    public TypeNode visit(IfElseStatement statement) {
+        return null;
     }
 
     @Override
-    public void visit(WhileStatement statement) {
-
+    public TypeNode visit(WhileStatement statement) {
+        return null;
     }
 
     @Override
-    public void visit(PrintStatement statement) {
-
+    public TypeNode visit(PrintStatement statement) {
+        return null;
     }
 
     @Override
-    public void visit(PrintLineStatement statement) {
-
+    public TypeNode visit(PrintLineStatement statement) {
+        return null;
     }
 
     @Override
-    public void visit(ReturnStatement statement) {
-
+    public TypeNode visit(ReturnStatement statement) {
+        return null;
     }
 
     @Override
-    public void visit(AssignmentStatement statement) {
-
+    public TypeNode visit(AssignmentStatement statement) {
+        return null;
     }
 
     @Override
-    public void visit(ArrayAssignment assignment) {
-
+    public TypeNode visit(ArrayAssignment assignment) {
+        return null;
     }
 
     @Override
-    public void visit(Block block) {
-
+    public TypeNode visit(Block block) {
+        return null;
     }
 
     @Override
-    public void visit(LessThanExpression expression) {
-
+    public TypeNode visit(LessThanExpression expression) {
+        return null;
     }
 
     @Override
-    public void visit(EqualityExpression expression) {
-
+    public TypeNode visit(EqualityExpression expression) {
+        return null;
     }
 
     @Override
-    public void visit(AddExpression expression) {
-
+    public TypeNode visit(AddExpression expression) {
+        return null;
     }
 
     @Override
-    public void visit(SubtractExpression expression) {
-
+    public TypeNode visit(SubtractExpression expression) {
+        return null;
     }
 
     @Override
-    public void visit(MultiplyExpression expression) {
-
+    public TypeNode visit(MultiplyExpression expression) {
+        return null;
     }
 
     @Override
-    public void visit(ParenExpression expression) {
-
+    public TypeNode visit(ParenExpression expression) {
+        return null;
     }
 
     @Override
-    public void visit(ArrayReference reference) {
-
+    public TypeNode visit(ArrayReference reference) {
+        return null;
     }
 
     @Override
-    public void visit(FunctionCall functionCall) {
-
+    public TypeNode visit(FunctionCall functionCall) {
+        return null;
     }
 
     @Override
-    public void visit(ExpressionList expressionList) {
-
+    public TypeNode visit(ExpressionList expressionList) {
+        return null;
     }
 
 }
