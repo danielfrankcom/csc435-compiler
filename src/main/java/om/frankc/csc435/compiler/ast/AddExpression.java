@@ -1,5 +1,7 @@
 package om.frankc.csc435.compiler.ast;
 
+import om.frankc.csc435.compiler.visit.IAstVisitor;
+
 public class AddExpression extends OperatorExpression {
 
     public AddExpression(Expression leftSide, Expression rightSide,

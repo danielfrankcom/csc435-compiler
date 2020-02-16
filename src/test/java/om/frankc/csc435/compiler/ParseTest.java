@@ -9,10 +9,10 @@ import java.nio.file.Paths;
 
 import static org.junit.Assert.*;
 
-public class AcceptanceTest {
+public class ParseTest {
 
-    private static final ClassLoader CLASS_LOADER = AcceptanceTest.class.getClassLoader();
-    private static final String TEST_FOLDER = "acceptance";
+    private static final ClassLoader CLASS_LOADER = ParseTest.class.getClassLoader();
+    private static final String TEST_FOLDER = "parse";
 
     private enum Group {
         accept,

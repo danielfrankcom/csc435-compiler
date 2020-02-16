@@ -1,4 +1,6 @@
-package om.frankc.csc435.compiler.ast;
+package om.frankc.csc435.compiler.visit;
+
+import om.frankc.csc435.compiler.ast.*;
 
 public interface IAstVisitor {
 

@@ -1,5 +1,7 @@
 package om.frankc.csc435.compiler.ast;
 
+import om.frankc.csc435.compiler.visit.IAstVisitor;
+
 import java.util.Objects;
 
 public class Identifier extends Expression {
