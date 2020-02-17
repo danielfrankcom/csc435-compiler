@@ -1,0 +1,9 @@
+void main() {
+}
+
+int foo(int foo) {
+    float bar;
+
+    foo = 5;
+    bar = 5.0;
+}

@@ -21,7 +21,8 @@ public class Type extends TypeNode {
 
         private final String mName;
 
-        String getName() {
+        @Override
+        public String toString() {
             return mName;
         }
 
@@ -35,8 +36,13 @@ public class Type extends TypeNode {
 
     private final Name mType;
 
-    public String getName() {
-        return mType.getName();
+    public Type.Name getName() {
+        return mType;
+    }
+
+    @Override
+    public String toString() {
+        return mType.toString();
     }
 
     @Override

@@ -1,0 +1,7 @@
+void main() {
+}
+
+void foo() {
+    int[10] foo;
+    foo[5.0] = 50;
+}

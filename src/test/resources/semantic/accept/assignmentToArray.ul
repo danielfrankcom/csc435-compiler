@@ -1,0 +1,8 @@
+void main() {
+}
+
+void foo() {
+    int[10] foo;
+    int[10] bar;
+    foo = bar;
+}

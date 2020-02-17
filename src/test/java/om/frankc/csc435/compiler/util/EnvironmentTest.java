@@ -23,8 +23,8 @@ public class EnvironmentTest {
         final Object one = new Object();
         final Object two = new Object();
 
-        mEnvironment.add("one", one);
-        mEnvironment.add("two", two);
+        mEnvironment.put("one", one);
+        mEnvironment.put("two", two);
 
         final Optional<Object> resultOne = mEnvironment.get("one");
         assertTrue(resultOne.isPresent());
@@ -41,11 +41,11 @@ public class EnvironmentTest {
         final Object oneInner = new Object();
         final Object two = new Object();
 
-        mEnvironment.add("one", oneOuter);
-        mEnvironment.add("two", two);
+        mEnvironment.put("one", oneOuter);
+        mEnvironment.put("two", two);
 
-        mEnvironment.startScope();
-        mEnvironment.add("one", oneInner);
+        mEnvironment.beginScope();
+        mEnvironment.put("one", oneInner);
 
         final Optional<Object> resultOneInner = mEnvironment.get("one");
         assertTrue(resultOneInner.isPresent());

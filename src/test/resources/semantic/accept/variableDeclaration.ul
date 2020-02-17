@@ -1,0 +1,11 @@
+void main() {
+}
+
+int foo(int foo) {
+    float bar;
+    string buzz;
+}
+
+void bar(int bar) {
+    int foo;
+}

@@ -1,0 +1,11 @@
+void main() {
+}
+
+int foo(int[5] foo) {
+    float[10] bar;
+
+    foo[0] = 5;
+
+    // Cannot check within bounds yet.
+    bar[100] = 5.0;
+}

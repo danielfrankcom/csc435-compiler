@@ -8,12 +8,12 @@ import java.util.Optional;
 public class Environment<K, V> {
 
     public Environment() {
-        startScope();
+        beginScope();
     }
 
     private final LinkedList<Map<K, V>> mScopes = new LinkedList<>();
 
-    public void startScope() {
+    public void beginScope() {
         final Map<K, V> scope = new HashMap<>();
         // Add to start to support iteration as LIFO.
         mScopes.addFirst(scope);
@@ -28,7 +28,7 @@ public class Environment<K, V> {
         mScopes.removeFirst();
     }
 
-    public void add(K key, V value) {
+    public void put(K key, V value) {
         mScopes.peek().put(key, value);
     }
 

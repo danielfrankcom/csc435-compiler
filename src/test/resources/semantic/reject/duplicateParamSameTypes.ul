@@ -1,0 +1,5 @@
+void main() {
+}
+
+void foo(string duplicate, string duplicate) {
+}

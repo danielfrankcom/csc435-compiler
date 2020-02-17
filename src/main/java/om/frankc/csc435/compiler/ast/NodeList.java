@@ -21,6 +21,10 @@ public abstract class NodeList<E extends AstNode> extends AstNode {
         return ImmutableList.copyOf(mElements);
     }
 
+    public int size() {
+        return mElements.size();
+    }
+
     @Override
     public abstract <T> T accept(IAstVisitor<T> visitor);
 
@@ -29,7 +33,7 @@ public abstract class NodeList<E extends AstNode> extends AstNode {
         if (this == other) {
             return true;
         }
-        if (other instanceof NodeList) {
+        if (this.getClass() == other.getClass()) {
             final NodeList<?> known = (NodeList<?>) other;
             return super.equals(known)
                     && Objects.equals(mElements, known.mElements);

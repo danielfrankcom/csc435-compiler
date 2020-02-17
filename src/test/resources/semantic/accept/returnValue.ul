@@ -1,0 +1,14 @@
+void main() {
+}
+
+string foo() {
+    return "string";
+}
+
+int bar() {
+    return 54;
+}
+
+void buzz() {
+    return;
+}

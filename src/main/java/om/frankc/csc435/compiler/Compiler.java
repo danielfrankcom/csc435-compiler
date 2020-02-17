@@ -2,7 +2,7 @@
 package om.frankc.csc435.compiler;
 
 import om.frankc.csc435.compiler.visit.IAstVisitor;
-import om.frankc.csc435.compiler.visit.PrettyPrintAstVisitor;
+import om.frankc.csc435.compiler.visit.print.PrettyPrintAstVisitor;
 import om.frankc.csc435.compiler.ast.Program;
 import om.frankc.csc435.compiler.generated.Csc435Lexer;
 import om.frankc.csc435.compiler.generated.Csc435Parser;

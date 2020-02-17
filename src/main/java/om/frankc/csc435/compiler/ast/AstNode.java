@@ -38,7 +38,7 @@ public abstract class AstNode {
         if (this == other) {
             return true;
         }
-        if (other instanceof AstNode) {
+        if (this.getClass() == other.getClass()) {
             final AstNode known = (AstNode) other;
             return Objects.equals(mLineNumber, known.mLineNumber)
                     && Objects.equals(mLinePosition, known.mLinePosition);

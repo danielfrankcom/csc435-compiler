@@ -71,11 +71,19 @@ functions returns [FunctionList fns]
         {
             functions.add(f);
         }
-    )+
+    )*
 {
-    assert functions.size() > 0;
-    final Function first = functions.get(0);
-    fns = new FunctionList(functions, first.getLineNumber(), first.getLinePosition());
+    final int lineNum;
+    final int linePos;
+    if (functions.size() > 0){
+        final Function first = functions.get(0);
+        lineNum = first.getLineNumber();
+        linePos = first.getLinePosition();
+    } else {
+        lineNum = 1;
+        linePos = 0;
+    };
+    fns = new FunctionList(functions, lineNum, linePos);
 };
 
 function returns [Function function]

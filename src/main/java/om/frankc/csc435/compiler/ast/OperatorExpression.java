@@ -30,7 +30,7 @@ public abstract class OperatorExpression extends Expression {
         if (this == other) {
             return true;
         }
-        if (other instanceof OperatorExpression) {
+        if (this.getClass() == other.getClass()) {
             final OperatorExpression known = (OperatorExpression) other;
             return super.equals(known)
                     && Objects.equals(mLeftSide, known.mLeftSide)
