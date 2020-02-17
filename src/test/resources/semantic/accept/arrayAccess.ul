@@ -1,0 +1,7 @@
+void main() {
+}
+
+float foo(int foo) {
+    float[5] bar;
+    return bar[0];
+}

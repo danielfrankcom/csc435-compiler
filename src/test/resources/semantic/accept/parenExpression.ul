@@ -1,0 +1,11 @@
+void main() {
+}
+
+int foo() {
+    int foo;
+    float bar;
+
+    bar = (5.0);
+    bar = ((((5.0))));
+    return ((foo));
+}

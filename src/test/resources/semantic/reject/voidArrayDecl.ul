@@ -1,0 +1,6 @@
+void main() {
+}
+
+void foo() {
+    void[5] bar;
+}

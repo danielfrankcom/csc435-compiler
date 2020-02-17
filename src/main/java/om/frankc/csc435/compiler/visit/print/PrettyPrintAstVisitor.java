@@ -219,8 +219,10 @@ public class PrettyPrintAstVisitor implements IAstVisitor<Void> {
         mIndentationLevel++;
 
         final VariableDeclarationList declarations = body.getDeclarations();
+        final StatementList statements = body.getStatements();
+
         declarations.accept(this);
-        if (declarations.getElements().size() > 0) {
+        if (declarations.getElements().size() > 0 && statements.getElements().size() > 0) {
             println();
         }
 

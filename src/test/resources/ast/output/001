@@ -7,5 +7,4 @@ int bar ()
     boolean id5;
     void id6;
     string[5] id7;
-
 }

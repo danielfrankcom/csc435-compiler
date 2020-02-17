@@ -74,6 +74,7 @@ public class SemanticTest {
             .put("arrayAssignmentNonArray.ul", "Type 'int' may not be indexed at 6:8")
             .put("arrayAssignmentNonIntIndex.ul", "Array index must be integer at 6:8")
             .put("arrayAssignmentWrongType.ul", "Type 'string' cannot be assigned to 'int[10]' at 6:13")
+            .put("arrayReturnWrongSize.ul", "Function 'foo' requires return type 'int[5]' at 6:4")
             .put("assignmentFromUndeclaredArray.ul", "Cannot access undeclared variable 'bar' at 6:10")
             .put("assignmentFromUndeclaredLiteral.ul", "Cannot access undeclared variable 'bar' at 6:10")
             .put("assignmentToWrongTypeArray.ul", "Type 'string' cannot be assigned to 'string[5]' at 6:10")
@@ -88,15 +89,22 @@ public class SemanticTest {
             .put("duplicateVariableDeclSameTypes.ul", "Duplicate variable named 'var' declared at 6:8")
             .put("empty.ul", "No function 'main' found at 1:0")
             .put("emptyReturnNonVoidFunction.ul", "Function 'foo' requires return type 'int' at 5:4")
+            .put("indexNonArray.ul", "Cannot index non-array type 'int' at 6:4")
+            .put("indexUndefinedArray.ul", "Attempt to access undefined array 'foo' at 5:4")
             .put("intReturnMain.ul", "Function 'main' must be of type 'void' at 1:0")
             .put("mainWithParams.ul", "Function 'main' may not have parameters at 1:9")
             .put("multipleMain.ul", "Duplicate function 'main' found at 4:5")
             .put("noMain.ul", "No function 'main' found at 1:0")
+            .put("nonIntArrayIndex.ul", "Array index must be of type 'int' at 6:8")
             .put("variableHideParam.ul", "Variable 'two' may not hide parameter at 5:8")
+            .put("voidArrayDecl.ul", "Array type 'void' invalid at 5:4")
+            .put("voidArrayParam.ul", "Array type 'void' invalid at 4:9")
+            .put("voidArrayReturn.ul", "Array type 'void' invalid at 4:0")
             .put("voidParamBeginning.ul", "Parameter type may not be 'void' at 4:9")
             .put("voidParamMiddle.ul", "Parameter type may not be 'void' at 4:29")
             .put("voidVariableDecl.ul", "Variable 'bar' may not use 'void' type at 5:4")
             .put("wrongReturnType.ul", "Function 'foo' requires return type 'int' at 5:4")
+            .put("wrongTypeInParens.ul", "Type 'float' cannot be assigned to 'int' at 6:10")
             .build();
 
     @Test
@@ -111,12 +119,18 @@ public class SemanticTest {
             System.out.printf("Testing '%s'\n", name);
 
             final String reason = REJECT_REASONS.get(name);
+            boolean exceptionThrown = false;
             try {
                 compile(file);
             } catch (SemanticException e) {
                 assertEquals(reason, e.toString());
+                exceptionThrown = true;
             } catch (Exception e) {
                 fail(e.getMessage());
+            }
+
+            if (exceptionThrown == false) {
+                fail(String.format("SemanticException expected for %s.", name));
             }
 
         }

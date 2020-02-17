@@ -1,0 +1,8 @@
+void main ()
+{
+}
+
+void foo (int one, float two)
+{
+    int three;
+}

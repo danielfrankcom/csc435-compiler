@@ -12,3 +12,13 @@ int bar() {
 void buzz() {
     return;
 }
+
+int[5] fizz() {
+    int[5] fizz;
+    return fizz;
+}
+
+int blah() {
+    int foo;
+    return foo;
+}

@@ -5,9 +5,7 @@ import om.frankc.csc435.compiler.ast.*;
 import om.frankc.csc435.compiler.util.Environment;
 import om.frankc.csc435.compiler.visit.IAstVisitor;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class SemanticCheckVisitor implements IAstVisitor<SemanticType> {
 
@@ -99,27 +97,39 @@ public class SemanticCheckVisitor implements IAstVisitor<SemanticType> {
 
         final FormalParameterList formalParams = declaration.getParamList();
         final List<SemanticParam> semanticParams = new ArrayList<>(formalParams.size());
+
+        // We cannot use the variable environment here as all declarations
+        // must be processed and checked before any function bodies.
+        final Set<String> uniqueNames = new HashSet<>();
+
         for (FormalParameter formalParam : formalParams.getElements()) {
 
             final SemanticType paramType = formalParam.accept(this);
+            final TypeNode typeNode = formalParam.getTypeNode();
             if (paramType.equals(SemanticType.VOID)) {
-                final TypeNode typeNode = formalParam.getTypeNode();
                 throwException(String.format("Parameter type may not be 'void' at %s", formatPos(typeNode)));
+            } else if (paramType.getName().equals(Type.Name.Void)) {
+                throwException(String.format("Array type 'void' invalid at %s", formatPos(typeNode)));
             }
 
             final Identifier paramId = formalParam.getId();
             final String paramName = paramId.getText();
-            if (mVariableEnvironment.containsKey(paramName)) {
+            if (uniqueNames.contains(paramName)) {
                 throwException(String.format("Duplicate parameter name '%s' found at %s",
                         paramName, formatPos(paramId)));
             }
 
             final SemanticParam param = new SemanticParam(paramType, paramName);
             semanticParams.add(param);
-            mVariableEnvironment.put(paramName, paramType);
+            uniqueNames.add(paramName);
         }
 
-        final SemanticType returnType = declaration.getTypeNode().accept(this);
+        final TypeNode typeNode = declaration.getTypeNode();
+        final SemanticType returnType = typeNode.accept(this);
+        if (returnType.isArray() && returnType.getName().equals(Type.Name.Void)) {
+            throwException(String.format("Array type 'void' invalid at %s", formatPos(typeNode)));
+        }
+
         final SemanticFunctionDecl mapValue = new SemanticFunctionDecl(returnType, name, semanticParams);
         mFunctionEnvironment.put(name, mapValue);
 
@@ -188,7 +198,16 @@ public class SemanticCheckVisitor implements IAstVisitor<SemanticType> {
 
     @Override
     public SemanticType visit(FunctionBody body) {
+        assert mCurrentFunction != null;
+
         mVariableEnvironment.beginScope();
+
+        for (SemanticParam param : mCurrentFunction.getParams()) {
+            final String name = param.getName();
+            final SemanticType type = param.getType();
+            assert mVariableEnvironment.containsKey(param.getName()) == false;
+            mVariableEnvironment.put(name, type);
+        }
 
         body.getDeclarations().accept(this);
         body.getStatements().accept(this);
@@ -229,6 +248,8 @@ public class SemanticCheckVisitor implements IAstVisitor<SemanticType> {
         final SemanticType type = typeNode.accept(this);
         if (type.equals(SemanticType.VOID)) {
             throwException(String.format("Variable '%s' may not use 'void' type at %s", name, formatPos(typeNode)));
+        } else if (type.getName().equals(Type.Name.Void)) {
+            throwException(String.format("Array type 'void' invalid at %s", formatPos(typeNode)));
         }
 
         mVariableEnvironment.put(name, type);
@@ -359,6 +380,7 @@ public class SemanticCheckVisitor implements IAstVisitor<SemanticType> {
 
     @Override
     public SemanticType visit(Block block) {
+        block.getStatements().accept(this);
         return null;
     }
 
@@ -389,12 +411,30 @@ public class SemanticCheckVisitor implements IAstVisitor<SemanticType> {
 
     @Override
     public SemanticType visit(ParenExpression expression) {
-        return null;
+        return expression.getExpression().accept(this);
     }
 
     @Override
     public SemanticType visit(ArrayReference reference) {
-        return null;
+        final String name = reference.getId().getText();
+        final Optional<SemanticType> result = mVariableEnvironment.get(name);
+
+        if (result.isPresent() == false) {
+            throwException(String.format("Attempt to access undefined array '%s' at %s", name, formatPos(reference)));
+        }
+
+        final SemanticType idType = result.get();
+        if (idType.isArray() == false) {
+            throwException(String.format("Cannot index non-array type '%s' at %s", idType, formatPos(reference)));
+        }
+
+        final Expression expression = reference.getExpression();
+        final SemanticType indexType = expression.accept(this);
+        if (indexType.equals(SemanticType.INT) == false) {
+            throwException(String.format("Array index must be of type 'int' at %s", formatPos(expression)));
+        }
+
+        return SemanticType.forName(idType.getName());
     }
 
     @Override
