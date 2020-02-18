@@ -1,0 +1,18 @@
+void main() {
+    return foo();
+}
+
+void foo() {
+    println 8;
+    println 9.4;
+    println 'h';
+    println "sth";
+    println true;
+    println false;
+
+    println bar();
+    println 9.8 * 6.14;
+}
+
+boolean bar() {
+}

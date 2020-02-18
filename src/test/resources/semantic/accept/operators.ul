@@ -1,0 +1,33 @@
+void main() {
+}
+
+int foo(int[5] foo) {
+    int result1;
+    float result2;
+    char result3;
+    string result4;
+    boolean result5;
+
+    result1 = 6 * 5 + (3 - 9) * intBar();
+    result2 = 6.9 * 5.3 + (3.1 - 9.0) * floatBar();
+    result3 = 'c' + 'd' + ('e' - 'f') - charBar();
+    result4 = "c" + "dd" + ("eee" + "ffff") + stringBar();
+
+    result5 = 8 < 9 < true < (5 < 8) == (89 == 9) == true == (true == true) < boolBar();
+    result5 = (5 + 5) * 6 - 6 == 5 + (5 + 5 + 5);
+}
+
+int intBar(){
+}
+
+float floatBar() {
+}
+
+char charBar() {
+}
+
+string stringBar() {
+}
+
+boolean boolBar() {
+}

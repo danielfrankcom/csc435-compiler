@@ -1,0 +1,10 @@
+void main() {
+}
+
+void foo() {
+    float condition;
+
+    if (condition) {
+    } else {
+    }
+}

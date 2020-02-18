@@ -1,0 +1,10 @@
+void main() {
+    bar();
+}
+
+void foo(int one, int two, string three, boolean four, char five, float six) {
+}
+
+void bar() {
+    foo(1, 5, "hello", true, 'c', 5.6, "string", true, true, 5, 8);
+}

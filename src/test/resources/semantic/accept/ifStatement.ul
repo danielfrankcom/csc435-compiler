@@ -1,0 +1,20 @@
+void main() {
+    return foo();
+}
+
+void foo() {
+    boolean constant;
+
+    if (true == true) {
+    } else {
+        ;
+    }
+
+    if (5 < 5 < constant) {
+        return;
+    } else {
+    }
+
+    if (constant) {
+    }
+}

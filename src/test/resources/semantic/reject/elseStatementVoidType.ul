@@ -1,0 +1,11 @@
+void main() {
+}
+
+void foo() {
+    if (bar()) {
+    } else {
+    }
+}
+
+void bar() {
+}

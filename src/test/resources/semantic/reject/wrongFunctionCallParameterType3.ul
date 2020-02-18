@@ -1,0 +1,6 @@
+void main() {
+    foo(4.6, "c", "true", 6);
+}
+
+void foo(float one, char two, boolean three, int four) {
+}

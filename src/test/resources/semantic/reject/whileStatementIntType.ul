@@ -1,0 +1,9 @@
+void main() {
+}
+
+void foo() {
+    int condition;
+
+    while (condition + condition) {
+    }
+}

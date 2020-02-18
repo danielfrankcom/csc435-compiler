@@ -1,0 +1,20 @@
+void main() {
+}
+
+boolean foo() {
+    boolean result;
+
+    result = 5 < 6;
+    result = 5 < 5;
+
+    result = 5.0 < 5.0;
+
+    result = ('c' < 'd');
+
+    "string1" < "string2";
+
+    result =
+        true < false;
+
+    return (result < false);
+}

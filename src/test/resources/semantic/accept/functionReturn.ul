@@ -1,0 +1,19 @@
+void main() {
+    return foo();
+}
+
+void foo() {
+    int value;
+    boolean result;
+
+    value = bar();
+    result = bar() == buzz();
+
+    return foo();
+}
+
+int bar() {
+}
+
+int buzz() {
+}

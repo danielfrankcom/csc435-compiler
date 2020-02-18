@@ -1,0 +1,6 @@
+void main() {
+    foo(4.6, "hello");
+}
+
+void foo(float one, char two) {
+}

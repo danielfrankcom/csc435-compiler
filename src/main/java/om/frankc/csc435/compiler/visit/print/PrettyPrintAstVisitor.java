@@ -371,18 +371,18 @@ public class PrettyPrintAstVisitor implements IAstVisitor<Void> {
     }
 
     @Override
-    public Void visit(LessThanExpression expression) {
+    public Void visit(EqualityExpression expression) {
         expression.getLeftSide().accept(this);
-        print('<');
+        print("==");
         expression.getRightSide().accept(this);
 
         return null;
     }
 
     @Override
-    public Void visit(EqualityExpression expression) {
+    public Void visit(LessThanExpression expression) {
         expression.getLeftSide().accept(this);
-        print("==");
+        print('<');
         expression.getRightSide().accept(this);
 
         return null;

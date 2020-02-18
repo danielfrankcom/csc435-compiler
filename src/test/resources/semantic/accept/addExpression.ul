@@ -1,0 +1,21 @@
+void main() {
+}
+
+boolean foo() {
+    int result1;
+    float result2;
+    char result3;
+    string result4;
+
+    result1 = 5 + 6;
+    result1 = 0 + 5;
+
+    result2 = 5.0 + 1.1;
+
+    result3 = ('c' + 'd');
+
+    result4 = "string1" + "string2";
+    "concat" + "these";
+
+    return "concatthese" == "concat" + "_" + "these";
+}

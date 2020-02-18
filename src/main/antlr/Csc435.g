@@ -284,15 +284,15 @@ returnStatement returns [ReturnStatement statement]
 };
 
 assignmentStatement returns [AssignmentStatement statement]
-: i=id EQUALS e=expr SEMICOLON
+: i=id eq=EQUALS e=expr SEMICOLON
 {
-    statement = new AssignmentStatement(i, e, i.getLineNumber(), i.getLinePosition());
+    statement = new AssignmentStatement(i, e, $eq.line, $eq.pos);
 };
 
 arrayAssignment returns [ArrayAssignment assignment]
-: i=id OPEN_BRACKET index=expr CLOSE_BRACKET EQUALS assign=expr SEMICOLON
+: i=id OPEN_BRACKET index=expr CLOSE_BRACKET eq=EQUALS assign=expr SEMICOLON
 {
-    assignment = new ArrayAssignment(i, index, assign, i.getLineNumber(), i.getLinePosition());
+    assignment = new ArrayAssignment(i, index, assign, $eq.line, $eq.pos);
 };
 
 block returns [Block block]

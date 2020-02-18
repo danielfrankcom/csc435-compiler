@@ -1,0 +1,10 @@
+void main() {
+}
+
+void foo() {
+    boolean[2] result;
+    boolean[2] array1;
+    boolean[2] array2;
+
+    result = array1 - array2;
+}

@@ -1,0 +1,11 @@
+void main() {
+    bar();
+}
+
+int foo(int[5] foo) {
+}
+
+void bar() {
+    int[5] temp;
+    foo(temp);
+}

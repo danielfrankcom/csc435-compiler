@@ -60,9 +60,9 @@ public interface IAstVisitor<T> {
 
     T visit(Block block);
 
-    T visit(LessThanExpression expression);
-
     T visit(EqualityExpression expression);
+
+    T visit(LessThanExpression expression);
 
     T visit(AddExpression expression);
 

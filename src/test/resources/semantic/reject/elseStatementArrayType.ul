@@ -1,0 +1,10 @@
+void main() {
+}
+
+void foo() {
+    int[5] array;
+
+    if (array) {
+    } else {
+    }
+}

@@ -1,0 +1,13 @@
+void main() {
+}
+
+void foo() {
+    string condition;
+
+    if (false) {
+        condition = "string1";
+        return condition;
+    } else {
+        condition = "string2";
+    }
+}

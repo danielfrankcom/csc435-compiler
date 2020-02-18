@@ -1,0 +1,11 @@
+void main() {
+}
+
+void foo() {
+    string condition;
+
+    while (false) {
+        condition = "string1";
+        return condition;
+    }
+}

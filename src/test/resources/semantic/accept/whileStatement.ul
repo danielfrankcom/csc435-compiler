@@ -1,0 +1,21 @@
+void main() {
+    return foo();
+}
+
+void foo() {
+    boolean constant;
+
+    while (true == true) {
+        ;
+    }
+
+    while (5 < 5 < constant) {
+    }
+
+    while (bar()) {
+        return;
+    }
+}
+
+boolean bar() {
+}

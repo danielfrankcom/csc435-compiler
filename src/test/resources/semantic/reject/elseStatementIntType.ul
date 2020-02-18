@@ -1,0 +1,10 @@
+void main() {
+}
+
+void foo() {
+    int condition;
+
+    if (condition + condition) {
+    } else {
+    }
+}

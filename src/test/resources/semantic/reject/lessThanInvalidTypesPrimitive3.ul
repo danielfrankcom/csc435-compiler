@@ -1,0 +1,6 @@
+void main() {
+}
+
+boolean foo() {
+    return 7 < 6.5;
+}

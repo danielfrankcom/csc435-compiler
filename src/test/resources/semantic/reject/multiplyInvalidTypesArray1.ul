@@ -1,0 +1,8 @@
+void main() {
+}
+
+void foo() {
+    boolean result;
+    boolean[2] array;
+    result = true * array;
+}

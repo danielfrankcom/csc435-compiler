@@ -1,6 +1,7 @@
 package om.frankc.csc435.compiler.visit.semantic;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import om.frankc.csc435.compiler.ast.*;
 import om.frankc.csc435.compiler.util.Environment;
 import om.frankc.csc435.compiler.visit.IAstVisitor;
@@ -274,28 +275,62 @@ public class SemanticCheckVisitor implements IAstVisitor<SemanticType> {
         return null;
     }
 
+    private void validateBooleanCondition(Expression expression) {
+        final SemanticType type = expression.accept(this);
+        if (type.equals(SemanticType.BOOL) == false) {
+            throwException(String.format("Non-boolean condition ('%s') provided to statement at %s", type,
+                    formatPos(expression)));
+        }
+    }
+
     @Override
     public SemanticType visit(IfStatement statement) {
+        validateBooleanCondition(statement.getExpression());
+        statement.getIfBlock().accept(this);
+
         return null;
     }
 
     @Override
     public SemanticType visit(IfElseStatement statement) {
+        validateBooleanCondition(statement.getExpression());
+        statement.getIfBlock().accept(this);
+        statement.getElseBlock().accept(this);
+
         return null;
     }
 
     @Override
     public SemanticType visit(WhileStatement statement) {
+        validateBooleanCondition(statement.getExpression());
+        statement.getBlock().accept(this);
+
         return null;
+    }
+
+    private void validatePrintStatement(Expression expression, String statementType) {
+        final SemanticType type = expression.accept(this);
+        final boolean typeValid = type.equals(SemanticType.INT)
+                || type.equals(SemanticType.FLOAT)
+                || type.equals(SemanticType.CHAR)
+                || type.equals(SemanticType.STRING)
+                || type.equals(SemanticType.BOOL);
+
+        if (typeValid == false) {
+            throwException(String.format("Invalid type '%s' provided to %s statement at %s", type, statementType,
+                    formatPos(expression)));
+        }
     }
 
     @Override
     public SemanticType visit(PrintStatement statement) {
+        validatePrintStatement(statement.getExpression(), "print");
         return null;
     }
 
     @Override
     public SemanticType visit(PrintLineStatement statement) {
+        validatePrintStatement(statement.getExpression(), "println");
         return null;
     }
 
@@ -331,14 +366,13 @@ public class SemanticCheckVisitor implements IAstVisitor<SemanticType> {
             throwException(String.format("Variable '%s' not declared prior to assignment at %s", name, formatPos(statement)));
         }
 
-        final Expression expression = statement.getExpression();
         final SemanticType lhsType = result.get();
-        final SemanticType rhsType = expression.accept(this);
+        final SemanticType rhsType = statement.getExpression().accept(this);
         assert rhsType != null;
 
         if (lhsType.equals(rhsType) == false) {
             throwException(String.format("Type '%s' cannot be assigned to '%s' at %s", rhsType.toString(),
-                    lhsType.toString(), formatPos(expression)));
+                    lhsType.toString(), formatPos(statement)));
         }
 
         return null;
@@ -366,13 +400,12 @@ public class SemanticCheckVisitor implements IAstVisitor<SemanticType> {
         final Type.Name lhsTypeName = lhsType.getName();
         final SemanticType validAssignment = SemanticType.forName(lhsTypeName);
 
-        final Expression assignment = statement.getAssignment();
-        final SemanticType rhsType = assignment.accept(this);
+        final SemanticType rhsType = statement.getAssignment().accept(this);
         assert rhsType != null;
 
         if (validAssignment.equals(rhsType) == false) {
             throwException(String.format("Type '%s' cannot be assigned to '%s' at %s", rhsType, lhsType,
-                    formatPos(assignment)));
+                    formatPos(statement)));
         }
 
         return null;
@@ -384,29 +417,100 @@ public class SemanticCheckVisitor implements IAstVisitor<SemanticType> {
         return null;
     }
 
-    @Override
-    public SemanticType visit(LessThanExpression expression) {
-        return null;
+    private SemanticType checkBooleanOperator(OperatorExpression expression,
+                                              ImmutableSet<SemanticType> supportedTypes) {
+        final Expression leftExpression = expression.getLeftSide();
+        final SemanticType leftType = leftExpression.accept(this);
+
+        final Expression rightExpression = expression.getRightSide();
+        final SemanticType rightType = rightExpression.accept(this);
+
+        if (leftType.equals(rightType) == false) {
+            throwException(String.format("Attempt to compare incomparable types '%s' and '%s' at %s", leftType,
+                    rightType, formatPos(expression)));
+        }
+
+        if (supportedTypes.contains(leftType) == false) {
+            throwException(String.format("May not perform comparison with type '%s' at %s", leftType,
+                    formatPos(expression)));
+        }
+
+        return SemanticType.BOOL;
     }
 
     @Override
     public SemanticType visit(EqualityExpression expression) {
-        return null;
+        final ImmutableSet<SemanticType> supportedTypes = ImmutableSet.of(
+                SemanticType.INT,
+                SemanticType.FLOAT,
+                SemanticType.CHAR,
+                SemanticType.STRING,
+                SemanticType.BOOL
+        );
+        return checkBooleanOperator(expression, supportedTypes);
+    }
+
+    @Override
+    public SemanticType visit(LessThanExpression expression) {
+        final ImmutableSet<SemanticType> supportedTypes = ImmutableSet.of(
+                SemanticType.INT,
+                SemanticType.FLOAT,
+                SemanticType.CHAR,
+                SemanticType.STRING,
+                SemanticType.BOOL
+        );
+        return checkBooleanOperator(expression, supportedTypes);
+    }
+
+    private SemanticType checkTypedOperator(OperatorExpression expression,
+                                            ImmutableSet<SemanticType> supportedTypes) {
+        final Expression leftExpression = expression.getLeftSide();
+        final SemanticType leftType = leftExpression.accept(this);
+
+        final Expression rightExpression = expression.getRightSide();
+        final SemanticType rightType = rightExpression.accept(this);
+
+        if (leftType.equals(rightType) == false) {
+            throwException(String.format("Attempt to operate on non-identical types '%s' and '%s' at %s", leftType,
+                    rightType, formatPos(expression)));
+        }
+
+        if (supportedTypes.contains(leftType) == false) {
+            throwException(String.format("May not perform operation with type '%s' at %s", leftType,
+                    formatPos(expression)));
+        }
+
+        return leftType;
     }
 
     @Override
     public SemanticType visit(AddExpression expression) {
-        return null;
+        final ImmutableSet<SemanticType> supportedTypes = ImmutableSet.of(
+                SemanticType.INT,
+                SemanticType.FLOAT,
+                SemanticType.CHAR,
+                SemanticType.STRING
+        );
+        return checkTypedOperator(expression, supportedTypes);
     }
 
     @Override
     public SemanticType visit(SubtractExpression expression) {
-        return null;
+        final ImmutableSet<SemanticType> supportedTypes = ImmutableSet.of(
+                SemanticType.INT,
+                SemanticType.FLOAT,
+                SemanticType.CHAR
+        );
+        return checkTypedOperator(expression, supportedTypes);
     }
 
     @Override
     public SemanticType visit(MultiplyExpression expression) {
-        return null;
+        final ImmutableSet<SemanticType> supportedTypes = ImmutableSet.of(
+                SemanticType.INT,
+                SemanticType.FLOAT
+        );
+        return checkTypedOperator(expression, supportedTypes);
     }
 
     @Override
@@ -439,12 +543,53 @@ public class SemanticCheckVisitor implements IAstVisitor<SemanticType> {
 
     @Override
     public SemanticType visit(FunctionCall functionCall) {
-        return null;
+        final String name = functionCall.getId().getText();
+
+        final Optional<SemanticFunctionDecl> result = mFunctionEnvironment.get(name);
+        if (result.isPresent() == false) {
+            throwException(String.format("Attempt to call undefined function '%s' at %s", name, formatPos(functionCall)));
+        }
+
+        final SemanticFunctionDecl function = result.get();
+        final ImmutableList<SemanticParam> expectedParams = function.getParams();
+
+        final ExpressionList actualArgList = functionCall.getExpressions();
+        final ImmutableList<Expression> actualParams = actualArgList.getElements();
+
+        for (int paramNum = 1; paramNum <= expectedParams.size(); paramNum++) {
+            final int index = paramNum - 1;
+            final SemanticParam expected = expectedParams.get(index);
+
+            if (actualParams.size() < paramNum) {
+                throwException(String.format("Parameter '%s' (#%d) missing at %s", expected.getName(), paramNum,
+                        formatPos(functionCall)));
+            }
+
+            final Expression actual = actualParams.get(index);
+            final SemanticType actualType = actual.accept(this);
+
+            if (expected.getType().equals(actualType) == false) {
+                throwException(String.format("Parameter '%s' (#%d) expects type '%s', not '%s' at %s",
+                        expected.getName(), paramNum, expected.getType(), actualType, formatPos(functionCall)));
+            }
+        }
+
+        final int actualNumParams = actualArgList.size();
+        final int expectedNumParams = expectedParams.size();
+        if (expectedNumParams < actualNumParams) {
+            final Expression firstExtra = actualParams.get(expectedNumParams);
+            final SemanticType extraType = firstExtra.accept(this);
+            throwException(String.format("Parameter of type '%s' unexpected (too many) at %s", extraType,
+                    formatPos(firstExtra)));
+        }
+
+        return function.getReturnType();
     }
 
     @Override
     public SemanticType visit(ExpressionList expressionList) {
-        return null;
+        final String message = "This method is not needed by this visitor and should not be called.";
+        throw new UnsupportedOperationException(message);
     }
 
 }
