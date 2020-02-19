@@ -120,17 +120,18 @@ public class AstTest {
             output.deleteOnExit();
             final File expected = entry.getValue();
 
+            final InputStream inputStream = new FileInputStream(input);
+            final OutputStream outputStream = new FileOutputStream(output);
+
             final String inputPath = input.getAbsolutePath();
             final String outputPath = output.getAbsolutePath();
             final String expectedPath = expected.getAbsolutePath();
 
-            final String[] arguments = {inputPath, "-p", outputPath};
-
-            System.out.printf("Testing %s -> %s -> %s\n", inputPath, outputPath, expectedPath);
+            System.out.printf("Testing '%s' -> '%s' -> '%s'\n", inputPath, outputPath, expectedPath);
 
             boolean success = false;
             try {
-                Compiler.main(arguments);
+                Compiler.compile(inputStream, outputStream, false);
 
                 // The above line will not throw an exception if successful,
                 // but will also not return a result. We double check that
@@ -228,7 +229,7 @@ public class AstTest {
                                                                                         31
                                                                                 ),
                                                                                 3,
-                                                                                4
+                                                                                10
                                                                         )
                                                                 );
                                                                 add(
@@ -246,7 +247,7 @@ public class AstTest {
                                                                                         11
                                                                                 ),
                                                                                 4,
-                                                                                4
+                                                                                7
                                                                         )
                                                                 );
                                                                 add(
@@ -265,7 +266,7 @@ public class AstTest {
                                                                                         18
                                                                                 ),
                                                                                 5,
-                                                                                4
+                                                                                10
                                                                         )
                                                                 );
                                                             }},

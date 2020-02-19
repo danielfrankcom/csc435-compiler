@@ -1,63 +1,109 @@
 
 package om.frankc.csc435.compiler;
 
-import om.frankc.csc435.compiler.visit.IAstVisitor;
-import om.frankc.csc435.compiler.visit.print.PrettyPrintAstVisitor;
 import om.frankc.csc435.compiler.ast.Program;
 import om.frankc.csc435.compiler.generated.Csc435Lexer;
 import om.frankc.csc435.compiler.generated.Csc435Parser;
+import om.frankc.csc435.compiler.visit.IAstVisitor;
+import om.frankc.csc435.compiler.visit.print.PrettyPrintAstVisitor;
+import om.frankc.csc435.compiler.visit.semantic.SemanticCheckVisitor;
+import om.frankc.csc435.compiler.visit.semantic.SemanticException;
 import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CommonTokenStream;
+import org.apache.commons.cli.*;
 
 import java.io.*;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class Compiler {
 
+    private static void printHelp(Options options) {
+        new HelpFormatter().printHelp("commandName [OPTIONS] <FILE>", options);
+    }
+
     public static void main(String[] args) throws Exception {
 
-        if (args.length != 1 && args.length != 3) {
-            System.out.println("Usage: Compiler filename.ul [-p output/prettyPrintFile.ul]");
-            throw new IllegalArgumentException();
+        final Options options = new Options();
+        options.addOption("h", "help", false, "Print help for command line arguments.");
+        options.addOption("p", "print", true, "Output path of pretty-print file.");
+
+        final CommandLineParser argParser = new DefaultParser();
+        final CommandLine commandLine;
+        commandLine = argParser.parse(options, args);
+
+        if (commandLine.hasOption("help")) {
+            printHelp(options);
+            return;
         }
 
-        final File prettyPrintOutput;
-        if (args.length > 1) {
-            assert "-p".equals(args[1]);
-            prettyPrintOutput = new File(args[2]);
+        final OutputStream output;
+        if (commandLine.hasOption("print")) {
+            final String outputPath = commandLine.getOptionValue("print");
+            final File outputFile = new File(outputPath);
+            output = new FileOutputStream(outputFile);
         } else {
-            prettyPrintOutput = null;
+            // Special value to disable pretty-printing.
+            output = null;
         }
 
-        final ANTLRInputStream input = new ANTLRInputStream(new FileInputStream(args[0]));
+        final List<String> remainingArgs = commandLine.getArgList();
+        if (remainingArgs.size() != 1) {
+            System.out.println("Too many arguments provided.\n");
+            printHelp(options);
+            return;
+        }
+
+        final String inputPath = remainingArgs.get(0);
+        final File inputFile = new File(inputPath);
+        final InputStream input = new FileInputStream(inputFile);
+
+        // This may throw other exceptions, but
+        // we want to fail fast so we let them go.
+        try {
+            compile(input, output, true);
+        } catch (SemanticException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     * This method provides separation of compilation logic while doubling as a convenience for unit tests.
+     */
+    public static void compile(InputStream input, OutputStream output, boolean semanticCheck) throws Exception {
+
+        final ANTLRInputStream antlrStream = new ANTLRInputStream(input);
 
         // The name of the grammar here is "Csc435",
         // so ANTLR generates Csc435Lexer and Csc435Parser
-        final Csc435Lexer lexer = new Csc435Lexer(input);
+        final Csc435Lexer lexer = new Csc435Lexer(antlrStream);
         final CommonTokenStream tokens = new CommonTokenStream(lexer);
         final Csc435Parser parser = new Csc435Parser(tokens);
 
-        // This may throw an exception however
-        // we want to fail fast so we let it go.
         final Program program = parser.program();
 
-        // Optional pretty-print functionality.
-        if (prettyPrintOutput != null) {
-            final BufferedWriter writer = new BufferedWriter(new FileWriter(prettyPrintOutput));
-            final Consumer<String> output = (string) -> {
+        if (semanticCheck) {
+            final SemanticCheckVisitor semanticVisitor = new SemanticCheckVisitor();
+            program.accept(semanticVisitor);
+        }
+
+        if (output != null) {
+
+            final Consumer<String> consumer = (string) -> {
                 try {
-                    writer.write(string);
+                    output.write(string.getBytes());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             };
 
-            final IAstVisitor<Void> visitor = new PrettyPrintAstVisitor(output);
-            program.accept(visitor);
+            final IAstVisitor<Void> printVisitor = new PrettyPrintAstVisitor(consumer);
+            program.accept(printVisitor);
 
-            writer.flush();
-            writer.close();
+            output.flush();
+            output.close();
         }
+
     }
 
 }

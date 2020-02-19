@@ -1,17 +1,12 @@
 package om.frankc.csc435.compiler;
 
 import com.google.common.collect.ImmutableMap;
-import om.frankc.csc435.compiler.ast.Program;
-import om.frankc.csc435.compiler.generated.Csc435Lexer;
-import om.frankc.csc435.compiler.generated.Csc435Parser;
-import om.frankc.csc435.compiler.visit.semantic.SemanticCheckVisitor;
 import om.frankc.csc435.compiler.visit.semantic.SemanticException;
-import org.antlr.runtime.ANTLRInputStream;
-import org.antlr.runtime.CommonTokenStream;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -50,22 +45,19 @@ public class SemanticTest {
     }
 
     private static void compile(File file) throws Exception {
-        final ANTLRInputStream input = new ANTLRInputStream(new FileInputStream(file));
+        final InputStream input = new FileInputStream(file);
 
-        final Csc435Lexer lexer = new Csc435Lexer(input);
-        final CommonTokenStream tokens = new CommonTokenStream(lexer);
-        final Csc435Parser parser = new Csc435Parser(tokens);
+        System.out.printf("Testing '%s'\n", file.getName());
 
-        final Program program = parser.program();
-        final SemanticCheckVisitor visitor = new SemanticCheckVisitor();
-        program.accept(visitor);
+        Compiler.compile(input, null, true);
     }
 
     @Test
     public void testAccept() throws Exception {
         final File[] files = getTestFilesForGroup(Group.accept);
         for (File file : files) {
-            System.out.printf("Testing '%s'\n", file.getName());
+
+            // Any exception will fail the test.
             compile(file);
         }
     }
@@ -199,7 +191,6 @@ public class SemanticTest {
 
             final String name = file.getName();
             assertTrue(REJECT_REASONS.containsKey(name));
-            System.out.printf("Testing '%s'\n", name);
 
             final String reason = REJECT_REASONS.get(name);
             boolean exceptionThrown = false;

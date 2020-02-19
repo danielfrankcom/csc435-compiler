@@ -3,6 +3,8 @@ package om.frankc.csc435.compiler;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -39,19 +41,22 @@ public class ParseTest {
         return children;
     }
 
+    private static void compile(File inputFile) throws Exception {
+        final InputStream input = new FileInputStream(inputFile);
+        Compiler.compile(input, null, false);
+    }
+
     @Test
     public void testCompilerAccepts() {
         final File[] acceptFiles = getTestFilesForGroup(Group.accept);
 
         for (File file : acceptFiles) {
-            final String path = file.getAbsolutePath();
-            final String[] arguments = {path};
 
-            System.out.printf("Testing %s\n", path);
+            System.out.printf("Testing '%s'\n", file.getName());
 
             boolean success = false;
             try {
-                Compiler.main(arguments);
+                compile(file);
 
                 // The above line will not throw an exception if successful,
                 // but will also not return a result. We double check that
@@ -71,14 +76,12 @@ public class ParseTest {
         final File[] rejectFiles = getTestFilesForGroup(Group.reject);
 
         for (File file : rejectFiles) {
-            final String path = file.getAbsolutePath();
-            final String[] arguments = {path};
 
-            System.out.printf("Testing %s\n", path);
+            System.out.printf("Testing %s\n", file.getName());
 
             Throwable exception = null;
             try {
-                Compiler.main(arguments);
+                compile(file);
             } catch (Throwable e) {
                 exception = e;
             }
