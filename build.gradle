@@ -21,6 +21,7 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     testCompile 'commons-io:commons-io:2.6'
+    testCompile 'org.apache.commons:commons-lang3:3.9'
 
 }
 

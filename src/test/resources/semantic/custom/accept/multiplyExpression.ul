@@ -1,6 +1,3 @@
-void main() {
-}
-
 boolean foo() {
     int result1;
     float result2;
@@ -9,4 +6,7 @@ boolean foo() {
     result1 = 0 * 5;
 
     return 9.8 == 5.0 * 1.1;
+}
+
+void main() {
 }

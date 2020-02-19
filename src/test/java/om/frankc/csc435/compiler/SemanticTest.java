@@ -2,6 +2,7 @@ package om.frankc.csc435.compiler;
 
 import com.google.common.collect.ImmutableMap;
 import om.frankc.csc435.compiler.visit.semantic.SemanticException;
+import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Test;
 
 import java.io.File;
@@ -17,7 +18,8 @@ public class SemanticTest {
 
     private static final ClassLoader CLASS_LOADER = SemanticTest.class.getClassLoader();
 
-    private static final String TEST_FOLDER = "semantic";
+    private static final String CUSTOM_TEST_FOLDER = "semantic/custom";
+    private static final String PROVIDED_TEST_FOLDER = "semantic/provided";
 
     private enum Group {
         accept,
@@ -30,8 +32,8 @@ public class SemanticTest {
      * @param group A {@link SemanticTest.Group} that uniquely identifies the set of files to address.
      * @return The generated {@link File[]}.
      */
-    private static File[] getTestFilesForGroup(SemanticTest.Group group) {
-        final Path combinedPath = Paths.get(TEST_FOLDER, group.name());
+    private static File[] getTestFilesForGroup(String folder, SemanticTest.Group group) {
+        final Path combinedPath = Paths.get(folder, group.name());
         final String relativePath = combinedPath.toFile().getPath();
         final URL rootPath = CLASS_LOADER.getResource(relativePath);
         assertNotNull(rootPath);
@@ -42,6 +44,12 @@ public class SemanticTest {
         assertNotEquals(0, children.length);
 
         return children;
+    }
+
+    private static File[] getTestFilesForGroup(SemanticTest.Group group) {
+        final File[] customTests = getTestFilesForGroup(CUSTOM_TEST_FOLDER, group);
+        final File[] providedTests = getTestFilesForGroup(PROVIDED_TEST_FOLDER, group);
+        return ArrayUtils.addAll(customTests, providedTests);
     }
 
     private static void compile(File file) throws Exception {
@@ -56,7 +64,6 @@ public class SemanticTest {
     public void testAccept() throws Exception {
         final File[] files = getTestFilesForGroup(Group.accept);
         for (File file : files) {
-
             // Any exception will fail the test.
             compile(file);
         }
@@ -180,6 +187,30 @@ public class SemanticTest {
             .put("wrongFunctionCallParameterType3.ul", "Parameter 'two' (#2) expects type 'char', not 'string' at 2:4")
             .put("wrongReturnType.ul", "Function 'foo' requires return type 'int' at 5:4")
             .put("wrongTypeInParens.ul", "Type 'float' cannot be assigned to 'int' at 6:8")
+            .put("woSt_2.1.1_invalid.ul", "No function 'main' found at 1:0")
+            .put("woSt_2.1.2a_invalid.ul", "Function 'main' may not have parameters at 1:9")
+            .put("woSt_2.1.2b_invalid.ul", "Function 'main' must be of type 'void' at 1:0")
+            .put("woSt_2.1.3_invalid.ul", "Duplicate function 'foo' found at 9:5")
+            .put("woSt_2.2.1_invalid.ul", "Duplicate parameter name 'a' found at 5:19")
+            .put("woSt_2.2.2_invalid.ul", "Duplicate variable named 'x' declared at 7:8")
+            .put("woSt_2.2.3_invalid.ul", "Parameter type may not be 'void' at 5:8")
+            .put("woSt_2.2.4_invalid.ul", "Variable 'a' may not use 'void' type at 6:4")
+            .put("woSt_2.2.6_invalid.ul", "Variable 'a' may not hide parameter at 6:8")
+            .put("woSt_2.2.7_invalid.ul", "Variable 'b' not declared prior to assignment at 6:6")
+            .put("woSt_3.1.1_invalid.ul", "Non-boolean condition ('int') provided to statement at 3:8")
+            .put("woSt_3.1.2_invalid.ul", "Non-boolean condition ('int') provided to statement at 3:11")
+            .put("woSt_3.1.3_invalid.ul", "Invalid type 'void' provided to print statement at 2:10")
+            .put("woSt_3.1.4_invalid.ul", "Invalid type 'void' provided to println statement at 2:12")
+            .put("woSt_3.1.5_invalid.ul", "Function 'foo' requires return type 'int' at 8:4")
+            .put("woSt_3.1.6_invalid.ul", "Type 'float' cannot be assigned to 'int' at 4:6")
+            .put("woSt_3.2.1_invalid.ul", "Array index must be of type 'int' at 3:12")
+            .put("woSt_3.2.2.a_invalid.ul", "Attempt to operate on non-identical types 'float' and 'int' at 5:10")
+            .put("woSt_3.2.2.b_invalid.ul", "May not perform operation with type 'string' at 10:12")
+            .put("woSt_3.2.2.c_invalid.ul", "May not perform operation with type 'string' at 6:12")
+            .put("woSt_3.2.2.d_invalid.ul", "Attempt to compare incomparable types 'char' and 'string' at 6:10")
+            .put("woSt_3.2.2.e_invalid.ul", "Attempt to compare incomparable types 'string' and 'int' at 6:12")
+            .put("woSt_3.3.a_invalid.ul", "Parameter 'b' (#2) missing at 2:4")
+            .put("woSt_3.3.b_invalid.ul", "Parameter 'b' (#1) expects type 'int', not 'float' at 4:4")
             .build();
 
     @Test
