@@ -38,13 +38,15 @@ public class Compiler {
         }
 
         final OutputStream output;
+        final File outputFile;
         if (commandLine.hasOption("print")) {
             final String outputPath = commandLine.getOptionValue("print");
-            final File outputFile = new File(outputPath);
+            outputFile = new File(outputPath);
             output = new FileOutputStream(outputFile);
         } else {
             // Special value to disable pretty-printing.
             output = null;
+            outputFile = null;
         }
 
         final List<String> remainingArgs = commandLine.getArgList();
@@ -63,7 +65,13 @@ public class Compiler {
         try {
             compile(input, output, true);
         } catch (SemanticException e) {
-            System.out.println(e.getMessage());
+            System.out.println(e.toString());
+
+            if (outputFile != null) {
+                //noinspection ResultOfMethodCallIgnored
+                outputFile.delete();
+            }
+            System.exit(1);
         }
     }
 
@@ -88,7 +96,6 @@ public class Compiler {
         }
 
         if (output != null) {
-
             final Consumer<String> consumer = (string) -> {
                 try {
                     output.write(string.getBytes());
