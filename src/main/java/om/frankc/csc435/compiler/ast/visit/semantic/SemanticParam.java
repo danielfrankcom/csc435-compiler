@@ -1,4 +1,4 @@
-package om.frankc.csc435.compiler.visit.semantic;
+package om.frankc.csc435.compiler.ast.visit.semantic;
 
 import java.util.Objects;
 

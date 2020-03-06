@@ -113,7 +113,6 @@ public class AstTest {
 
         final ImmutableMap<File, File> testFiles = getTestFiles();
 
-
         for (Map.Entry<File, File> entry : testFiles.entrySet()) {
             final File input = entry.getKey();
             final File output = File.createTempFile("compilerTest", null);
@@ -131,7 +130,7 @@ public class AstTest {
 
             boolean success = false;
             try {
-                Compiler.compile(inputStream, outputStream, false);
+                Compiler.compile("", inputStream, outputStream, null, false);
 
                 // The above line will not throw an exception if successful,
                 // but will also not return a result. We double check that

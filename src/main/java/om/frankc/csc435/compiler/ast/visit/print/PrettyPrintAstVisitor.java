@@ -1,7 +1,7 @@
-package om.frankc.csc435.compiler.visit.print;
+package om.frankc.csc435.compiler.ast.visit.print;
 
 import om.frankc.csc435.compiler.ast.*;
-import om.frankc.csc435.compiler.visit.IAstVisitor;
+import om.frankc.csc435.compiler.ast.visit.IAstVisitor;
 
 import java.util.Iterator;
 import java.util.Optional;
@@ -161,7 +161,9 @@ public class PrettyPrintAstVisitor implements IAstVisitor<Void> {
 
     @Override
     public Void visit(StringLiteral literal) {
+        print("\"");
         print(literal.getValue());
+        print("\"");
 
         return null;
     }

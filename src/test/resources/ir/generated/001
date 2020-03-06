@@ -1,0 +1,69 @@
+PROG test
+
+FUNC main ()V
+{
+    TEMP 0:I;
+    TEMP 1:I;
+    TEMP 2:U;
+    TEMP 3:U;
+    TEMP 4:U;
+    TEMP 5:U;
+    TEMP 6:C;
+    TEMP 7:C;
+    TEMP 8:U;
+    TEMP 9:F;
+    TEMP 10:F;
+    TEMP 11:U;
+    TEMP 12:I;
+    TEMP 13:I;
+    TEMP 14:U;
+    TEMP 15:Z;
+    TEMP 16:Z;
+    TEMP 17:U;
+    TEMP 18:Z;
+    TEMP 19:Z;
+    TEMP 20:U;
+
+        T1 := 1;
+        T0 := T1;
+        PRINTLNI T0;
+        PRINTI T0;
+        T2 := "";
+        PRINTLNU T2;
+        T3 := "string";
+        PRINTLNU T3;
+        T4 := "string";
+        PRINTU T4;
+        T5 := "";
+        PRINTLNU T5;
+        T6 := 'c';
+        PRINTLNC T6;
+        T7 := 'c';
+        PRINTC T7;
+        T8 := "";
+        PRINTLNU T8;
+        T9 := 5.0;
+        PRINTLNF T9;
+        T10 := 5.0;
+        PRINTF T10;
+        T11 := "";
+        PRINTLNU T11;
+        T12 := 7;
+        PRINTLNI T12;
+        T13 := 7;
+        PRINTI T13;
+        T14 := "";
+        PRINTLNU T14;
+        T15 := TRUE;
+        PRINTLNZ T15;
+        T16 := TRUE;
+        PRINTZ T16;
+        T17 := "";
+        PRINTLNU T17;
+        T18 := FALSE;
+        PRINTLNZ T18;
+        T19 := FALSE;
+        PRINTZ T19;
+        T20 := "";
+        PRINTLNU T20;
+}

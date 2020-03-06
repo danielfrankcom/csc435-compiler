@@ -1,7 +1,7 @@
 package om.frankc.csc435.compiler;
 
 import com.google.common.collect.ImmutableMap;
-import om.frankc.csc435.compiler.visit.semantic.SemanticException;
+import om.frankc.csc435.compiler.ast.visit.semantic.SemanticException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Test;
 
@@ -57,7 +57,7 @@ public class SemanticTest {
 
         System.out.printf("Testing '%s'\n", file.getName());
 
-        Compiler.compile(input, null, true);
+        Compiler.compile("", input, null, null, true);
     }
 
     @Test

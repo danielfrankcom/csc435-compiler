@@ -13,13 +13,13 @@ USAGE_OUTPUT="Expected command: './compile [input-path] [output-path:optional]'"
 INPUT=$1
 
 if [ "$INPUT" == "-h" ] || [ "$INPUT" == "--help" ]; then
-    echo $USAGE_OUTPUT
+    echo "$USAGE_OUTPUT"
     exit 0
 fi
 
 if test ! -f "$INPUT"; then
     echo "Input file \"$INPUT\" not found"
-    echo $USAGE_OUTPUT
+    echo "$USAGE_OUTPUT"
     exit 1
 fi
 
@@ -37,7 +37,7 @@ JAR_FILE="$SCRIPT_DIR/build/libs/csc435-compiler.jar"
 if test ! -f "$JAR_FILE"; then
     echo "Jar not found at \"$JAR_FILE\""
     echo "Recompiling"
-    ( cd $SCRIPT_DIR ; make build )
+    ( cd "$SCRIPT_DIR" ; make build )
 fi
 
 if test -z "$OUTPUT"; then

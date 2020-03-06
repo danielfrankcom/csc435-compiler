@@ -2,17 +2,22 @@
 package om.frankc.csc435.compiler;
 
 import om.frankc.csc435.compiler.ast.Program;
+import om.frankc.csc435.compiler.ast.visit.IAstVisitor;
+import om.frankc.csc435.compiler.ast.visit.irgen.IrGenVisitor;
+import om.frankc.csc435.compiler.ast.visit.print.PrettyPrintAstVisitor;
+import om.frankc.csc435.compiler.ast.visit.semantic.SemanticCheckVisitor;
+import om.frankc.csc435.compiler.ast.visit.semantic.SemanticException;
 import om.frankc.csc435.compiler.generated.Csc435Lexer;
 import om.frankc.csc435.compiler.generated.Csc435Parser;
-import om.frankc.csc435.compiler.visit.IAstVisitor;
-import om.frankc.csc435.compiler.visit.print.PrettyPrintAstVisitor;
-import om.frankc.csc435.compiler.visit.semantic.SemanticCheckVisitor;
-import om.frankc.csc435.compiler.visit.semantic.SemanticException;
+import om.frankc.csc435.compiler.ir.IrProgram;
+import om.frankc.csc435.compiler.ir.visit.IIrVisitor;
+import om.frankc.csc435.compiler.ir.visit.print.PrettyPrintIrVisitor;
 import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.apache.commons.cli.*;
 
 import java.io.*;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -27,6 +32,7 @@ public class Compiler {
         final Options options = new Options();
         options.addOption("h", "help", false, "Print help for command line arguments.");
         options.addOption("p", "print", true, "Output path of pretty-print file.");
+        options.addOption("i", "ir", true, "Output path of IR generation.");
 
         final CommandLineParser argParser = new DefaultParser();
         final CommandLine commandLine;
@@ -37,16 +43,28 @@ public class Compiler {
             return;
         }
 
-        final OutputStream output;
-        final File outputFile;
+        final List<File> toDeleteIfError = new LinkedList<>();
+
+        final OutputStream prettyPrintOutput;
         if (commandLine.hasOption("print")) {
             final String outputPath = commandLine.getOptionValue("print");
-            outputFile = new File(outputPath);
-            output = new FileOutputStream(outputFile);
+            final File output = new File(outputPath);
+            toDeleteIfError.add(output);
+            prettyPrintOutput = new FileOutputStream(output);
         } else {
             // Special value to disable pretty-printing.
-            output = null;
-            outputFile = null;
+            prettyPrintOutput = null;
+        }
+
+        final OutputStream irGenOutput;
+        if (commandLine.hasOption("ir")) {
+            final String outputPath = commandLine.getOptionValue("ir");
+            final File output = new File(outputPath);
+            toDeleteIfError.add(output);
+            irGenOutput = new FileOutputStream(output);
+        } else {
+            // Special value to disable ir generation.
+            irGenOutput = null;
         }
 
         final List<String> remainingArgs = commandLine.getArgList();
@@ -58,19 +76,20 @@ public class Compiler {
 
         final String inputPath = remainingArgs.get(0);
         final File inputFile = new File(inputPath);
+        final String inputFileName = inputFile.getName();
         final InputStream input = new FileInputStream(inputFile);
 
-        // This may throw other exceptions, but
-        // we want to fail fast so we let them go.
+        // This may throw other exceptions, but we want to fail fast so we let them go.
         try {
-            compile(input, output, true);
+            compile(inputFileName, input, prettyPrintOutput, irGenOutput, true);
         } catch (SemanticException e) {
             System.out.println(e.toString());
 
-            if (outputFile != null) {
+            for (File file : toDeleteIfError) {
                 //noinspection ResultOfMethodCallIgnored
-                outputFile.delete();
+                file.delete();
             }
+
             System.exit(1);
         }
     }
@@ -78,7 +97,8 @@ public class Compiler {
     /**
      * This method provides separation of compilation logic while doubling as a convenience for unit tests.
      */
-    public static void compile(InputStream input, OutputStream output, boolean semanticCheck) throws Exception {
+    public static void compile(String inputFileName, InputStream input, OutputStream prettyPrintOutput,
+                               OutputStream irGenOutput, boolean semanticCheck) throws Exception {
 
         final ANTLRInputStream antlrStream = new ANTLRInputStream(input);
 
@@ -95,10 +115,30 @@ public class Compiler {
             program.accept(semanticVisitor);
         }
 
-        if (output != null) {
+        if (irGenOutput != null) {
+            final IrGenVisitor irVisitor = new IrGenVisitor(inputFileName);
+            program.accept(irVisitor);
+            final IrProgram irProgram = irVisitor.getProgram();
+
             final Consumer<String> consumer = (string) -> {
                 try {
-                    output.write(string.getBytes());
+                    irGenOutput.write(string.getBytes());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            };
+
+            final IIrVisitor<Void> printVisitor = new PrettyPrintIrVisitor(consumer);
+            irProgram.accept(printVisitor);
+
+            irGenOutput.flush();
+            irGenOutput.close();
+        }
+
+        if (prettyPrintOutput != null) {
+            final Consumer<String> consumer = (string) -> {
+                try {
+                    prettyPrintOutput.write(string.getBytes());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -107,8 +147,8 @@ public class Compiler {
             final IAstVisitor<Void> printVisitor = new PrettyPrintAstVisitor(consumer);
             program.accept(printVisitor);
 
-            output.flush();
-            output.close();
+            prettyPrintOutput.flush();
+            prettyPrintOutput.close();
         }
 
     }

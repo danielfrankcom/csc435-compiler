@@ -410,7 +410,8 @@ stringLiteral returns [StringLiteral literal]
 : constant=STRING_CONSTANT
 {
     final String value = constant.getText();
-    literal = new StringLiteral(value, $constant.line, $constant.pos);
+    final String content = value.substring(1, value.length() - 1);
+    literal = new StringLiteral(content, $constant.line, $constant.pos);
 };
 
 intLiteral returns [IntegerLiteral literal]

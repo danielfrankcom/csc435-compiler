@@ -1,6 +1,5 @@
-package om.frankc.csc435.compiler.visit.semantic;
+package om.frankc.csc435.compiler.ast.visit.semantic;
 
-// todo: handler needs this exception on it
 public class SemanticException extends RuntimeException {
 
     SemanticException(String message) {

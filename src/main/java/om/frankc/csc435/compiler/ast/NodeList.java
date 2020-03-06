@@ -1,7 +1,7 @@
 package om.frankc.csc435.compiler.ast;
 
 import com.google.common.collect.ImmutableList;
-import om.frankc.csc435.compiler.visit.IAstVisitor;
+import om.frankc.csc435.compiler.ast.visit.IAstVisitor;
 
 import java.util.List;
 import java.util.Objects;

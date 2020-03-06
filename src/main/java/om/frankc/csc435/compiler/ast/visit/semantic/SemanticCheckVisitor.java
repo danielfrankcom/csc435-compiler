@@ -1,10 +1,10 @@
-package om.frankc.csc435.compiler.visit.semantic;
+package om.frankc.csc435.compiler.ast.visit.semantic;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import om.frankc.csc435.compiler.ast.*;
 import om.frankc.csc435.compiler.util.Environment;
-import om.frankc.csc435.compiler.visit.IAstVisitor;
+import om.frankc.csc435.compiler.ast.visit.IAstVisitor;
 
 import java.util.*;
 

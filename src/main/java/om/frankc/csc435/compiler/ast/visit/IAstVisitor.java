@@ -1,4 +1,4 @@
-package om.frankc.csc435.compiler.visit;
+package om.frankc.csc435.compiler.ast.visit;
 
 import om.frankc.csc435.compiler.ast.*;
 

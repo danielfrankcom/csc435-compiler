@@ -19,9 +19,6 @@ public class Environment<K, V> {
         mScopes.addFirst(scope);
     }
 
-    /**
-     * todo: calling to end first scope is an error
-     */
     public void endScope() {
         assert mScopes.size() > 1;
         // Remove from start to support iteration as LIFO.
