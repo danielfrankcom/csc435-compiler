@@ -1,0 +1,21 @@
+PROG test
+
+FUNC main ()V
+{
+    TEMP 0:I;
+    TEMP 1:I;
+    TEMP 2:I;
+    TEMP 3:I;
+    TEMP 4:I;
+    TEMP 5:I;
+    TEMP 6:I;
+
+        T0 := 4;
+        T1 := 5;
+        T2 := T0 I* T1;
+        T3 := 5;
+        T4 := 4;
+        T5 := T3 I* T4;
+        T6 := T2 I+ T5;
+        PRINTLNI T6;
+}
