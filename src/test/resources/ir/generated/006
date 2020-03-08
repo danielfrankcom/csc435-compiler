@@ -1,0 +1,83 @@
+PROG test
+
+FUNC factorial (I)I
+{
+    TEMP 0:I;
+    TEMP 1:I;
+    TEMP 2:Z;
+    TEMP 3:Z;
+    TEMP 4:I;
+    TEMP 5:I;
+    TEMP 6:Z;
+    TEMP 7:Z;
+    TEMP 8:I;
+    TEMP 9:I;
+    TEMP 10:I;
+    TEMP 11:I;
+    TEMP 12:I;
+
+        T1 := 0;
+        T2 := T0 I== T1;
+        T3 := Z! T2;
+        IF T3 GOTO L0;
+        T4 := 1;
+        RETURN T4;
+    L0:;
+        T5 := 1;
+        T6 := T0 I== T5;
+        T7 := Z! T6;
+        IF T7 GOTO L1;
+        T8 := 1;
+        RETURN T8;
+        GOTO L2;
+    L1:;
+        T9 := 1;
+        T10 := T0 I- T9;
+        T11 := CALL factorial(T10);
+        T12 := T0 I* T11;
+        RETURN T12;
+    L2:;
+}
+
+FUNC printPrefix (I)V
+{
+    TEMP 0:I;
+    TEMP 1:U;
+    TEMP 2:U;
+
+        T1 := "The factorial of ";
+        PRINTU T1;
+        PRINTI T0;
+        T2 := " is: ";
+        PRINTU T2;
+}
+
+FUNC main ()V
+{
+    TEMP 0:I;
+    TEMP 1:I;
+    TEMP 2:I;
+    TEMP 3:I;
+    TEMP 4:Z;
+    TEMP 5:Z;
+    TEMP 6:I;
+    TEMP 7:I;
+    TEMP 8:I;
+
+        T2 := 0;
+        T0 := T2;
+    L0:;
+        T3 := 11;
+        T4 := T0 I< T3;
+        T5 := Z! T4;
+        IF T5 GOTO L1;
+        CALL printPrefix(T0);
+        T6 := CALL factorial(T0);
+        T1 := T6;
+        PRINTLNI T1;
+        T7 := 1;
+        T8 := T0 I+ T7;
+        T0 := T8;
+        GOTO L0;
+    L1:;
+}

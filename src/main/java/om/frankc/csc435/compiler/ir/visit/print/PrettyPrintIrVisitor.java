@@ -4,6 +4,7 @@ import om.frankc.csc435.compiler.ir.*;
 import om.frankc.csc435.compiler.ir.visit.IIrVisitor;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public class PrettyPrintIrVisitor implements IIrVisitor<Void> {
@@ -63,6 +64,10 @@ public class PrettyPrintIrVisitor implements IIrVisitor<Void> {
 
     private void println(char character) {
         println(Character.toString(character));
+    }
+
+    private void println(int integer) {
+        println(Integer.toString(integer));
     }
 
     private void println() {
@@ -151,38 +156,149 @@ public class PrettyPrintIrVisitor implements IIrVisitor<Void> {
 
     @Override
     public Void visit(IrType type) {
-        print(type.toString());
+        final String output;
+        if (type instanceof IrType.Atomic) {
+            final IrType.Atomic atomic = (IrType.Atomic) type;
+            switch (atomic) {
+                case Boolean:
+                    output = "Z";
+                    break;
+                case Character:
+                    output = "C";
+                    break;
+                case FloatingPoint:
+                    output = "F";
+                    break;
+                case Integer:
+                    output = "I";
+                    break;
+                case Void:
+                    output = "V";
+                    break;
+                default:
+                    final String message = "Unexpected type";
+                    throw new IllegalArgumentException(message);
+            }
+        } else {
+            assert type instanceof IrType.Reference;
+            final IrType.Reference reference = (IrType.Reference) type;
+            switch (reference) {
+                case String:
+                    output = "U";
+                    break;
+                case BooleanArray:
+                    output = "AZ";
+                    break;
+                case CharacterArray:
+                    output = "AC";
+                    break;
+                case FloatingPointArray:
+                    output = "AF";
+                    break;
+                case IntegerArray:
+                    output = "AI";
+                    break;
+                case StringArray:
+                    output = "AU";
+                    break;
+                default:
+                    final String message = "Unexpected type";
+                    throw new IllegalArgumentException(message);
+            }
+        }
+        print(output);
         return null;
     }
 
     @Override
-    public Void visit(IrLabel label) {
+    public Void visit(IrLabel instruction) {
+        mIndentationLevel--;
+        print("L");
+        print(instruction.getLabelNum());
+        println(":;");
+        mIndentationLevel++;
         return null;
     }
 
     @Override
-    public Void visit(ConstantAssignment assignment) {
-        assignment.getOperand().accept(this);
-        print(" := ");
-        print(assignment.getConstant());
+    public Void visit(Jump instruction) {
+        print("GOTO L");
+        print(instruction.getJumpLabel().getLabelNum());
         println(";");
         return null;
     }
 
     @Override
-    public Void visit(VariableAssignment assignment) {
-        assignment.getLeft().accept(this);
-        print(" := ");
-        assignment.getRight().accept(this);
+    public Void visit(ConditionalJump instruction) {
+        print("IF ");
+        instruction.getCondition().accept(this);
+        print(" GOTO L");
+        print(instruction.getJumpLabel().getLabelNum());
         println(";");
         return null;
     }
 
     @Override
-    public Void visit(Print statement) {
+    public Void visit(IrInitializeArray instruction) {
+        instruction.getTemp().accept(this);
+        print(" := NEWARRAY ");
+        instruction.getType().accept(this);
+        print(" ");
+        print(instruction.getSize());
+        println(";");
+
+        return null;
+    }
+
+    @Override
+    public Void visit(IrArrayAssignment instruction) {
+        instruction.getArray().accept(this);
+        print("[");
+        instruction.getIndex().accept(this);
+        print("] := ");
+        instruction.getValue().accept(this);
+        println(";");
+
+        return null;
+    }
+
+    @Override
+    public Void visit(IrArrayAccess instruction) {
+        instruction.getResult().accept(this);
+        print(" := ");
+        instruction.getArray().accept(this);
+        print("[");
+        instruction.getIndex().accept(this);
+        println("];");
+
+        return null;
+    }
+
+    @Override
+    public Void visit(ConstantAssignment instruction) {
+        instruction.getOperand().accept(this);
+        print(" := ");
+        print(instruction.getConstant());
+        println(";");
+
+        return null;
+    }
+
+    @Override
+    public Void visit(VariableAssignment instruction) {
+        instruction.getLeft().accept(this);
+        print(" := ");
+        instruction.getRight().accept(this);
+        println(";");
+
+        return null;
+    }
+
+    @Override
+    public Void visit(Print instruction) {
         print("PRINT");
 
-        final IrTemp temp = statement.getOperand();
+        final IrTemp temp = instruction.getOperand();
         temp.getType().accept(this);
         print(" ");
         temp.accept(this);
@@ -192,13 +308,109 @@ public class PrettyPrintIrVisitor implements IIrVisitor<Void> {
     }
 
     @Override
-    public Void visit(PrintLn statement) {
+    public Void visit(PrintLn instruction) {
         print("PRINTLN");
 
-        final IrTemp temp = statement.getOperand();
+        final IrTemp temp = instruction.getOperand();
         temp.getType().accept(this);
         print(" ");
         temp.accept(this);
+        println(";");
+
+        return null;
+    }
+
+    @Override
+    public Void visit(IrCall instruction) {
+        print("CALL ");
+        final String name = instruction.getFunctionName();
+        print(name);
+
+        print("(");
+        for (IrTemp temp : instruction.getParams()) {
+            temp.accept(this);
+        }
+        println(");");
+
+        return null;
+    }
+
+    @Override
+    public Void visit(IrCallWithResult instruction) {
+        instruction.getResult().accept(this);
+        print(" := ");
+        this.visit((IrCall) instruction);
+
+        return null;
+    }
+
+    @Override
+    public Void visit(IrReturn instruction) {
+        final Optional<IrTemp> possibleValue = instruction.getValue();
+
+        print("RETURN");
+        if (possibleValue.isPresent()) {
+            final IrTemp value = possibleValue.get();
+            print(" ");
+            value.accept(this);
+        }
+
+        println(";");
+        return null;
+    }
+
+    private void printBinaryOperation(BinaryOperation operation, String operator) {
+        final IrTemp left = operation.getLeft();
+        final IrTemp right = operation.getRight();
+        final IrTemp result = operation.getResult();
+        final IrType opType = left.getType();
+
+        result.accept(this);
+        print(" := ");
+        left.accept(this);
+        print(" ");
+        opType.accept(this);
+        print(operator);
+        print(" ");
+        right.accept(this);
+        println(";");
+    }
+
+    @Override
+    public Void visit(IrEquality instruction) {
+        printBinaryOperation(instruction, "==");
+        return null;
+    }
+
+    @Override
+    public Void visit(IrLessThan instruction) {
+        printBinaryOperation(instruction, "<");
+        return null;
+    }
+
+    @Override
+    public Void visit(IrAdd instruction) {
+        printBinaryOperation(instruction, "+");
+        return null;
+    }
+
+    @Override
+    public Void visit(IrSubtract instruction) {
+        printBinaryOperation(instruction, "-");
+        return null;
+    }
+
+    @Override
+    public Void visit(IrMultiply instruction) {
+        printBinaryOperation(instruction, "*");
+        return null;
+    }
+
+    @Override
+    public Void visit(IrInversion instruction) {
+        instruction.getResult().accept(this);
+        print(" := Z! ");
+        instruction.getOriginal().accept(this);
         println(";");
 
         return null;

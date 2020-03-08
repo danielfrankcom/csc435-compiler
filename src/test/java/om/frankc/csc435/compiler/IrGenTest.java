@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.io.*;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -137,15 +138,10 @@ public class IrGenTest {
             }
 
             assertTrue(success);
-            final boolean filesEqual = FileUtils.contentEquals(expected, output);
+            final String expectedText  = FileUtils.readFileToString(expected, Charset.defaultCharset());
+            final String actualText = FileUtils.readFileToString(output, Charset.defaultCharset());
 
-            if (filesEqual == false) {
-                System.out.println("Expected:");
-                printFile(expected);
-                System.out.println("Actual:");
-                printFile(output);
-                fail();
-            }
+            assertEquals(expectedText, actualText);
         }
     }
 
@@ -231,16 +227,11 @@ public class IrGenTest {
             assertTrue(success);
 
             final File output = new File(outPath);
-            final boolean filesEqual = FileUtils.contentEquals(expected, output);
+            final String expectedText  = FileUtils.readFileToString(expected, Charset.defaultCharset());
+            final String actualText = FileUtils.readFileToString(output, Charset.defaultCharset());
 
             try {
-                if (filesEqual == false) {
-                    System.out.println("Expected:");
-                    printFile(expected);
-                    System.out.println("Actual:");
-                    printFile(output);
-                    fail();
-                }
+                assertEquals(expectedText, actualText);
             } finally {
                 Files.deleteIfExists(Paths.get(tempPath));
                 Files.deleteIfExists(Paths.get(irPath));

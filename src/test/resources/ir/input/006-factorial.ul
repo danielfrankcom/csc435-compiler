@@ -1,0 +1,32 @@
+// sample.ul
+int factorial(int n) {
+    if (n == 0) {
+        return 1;
+    }
+    if (n == 1) {
+        return 1;
+    }
+    else {
+        return (n * factorial(n-1));
+    }
+}
+
+void printPrefix(int value) {
+    print "The factorial of ";
+    print value;
+    print " is: ";
+}
+
+void main() {
+    int curr;
+    int factorial;
+
+    curr = 0;
+    while (curr < 11) {
+        printPrefix(curr);
+        factorial = factorial(curr);
+        println(factorial);
+
+        curr = curr + 1;
+    }
+}

@@ -6,9 +6,7 @@ import om.frankc.csc435.compiler.ast.visit.IAstVisitor;
 import om.frankc.csc435.compiler.ir.*;
 import om.frankc.csc435.compiler.util.Environment;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class IrGenVisitor implements IAstVisitor<IrTemp> {
 
@@ -19,17 +17,17 @@ public class IrGenVisitor implements IAstVisitor<IrTemp> {
             assert Type.Name.values().length == 6;
             switch (type.getName()) {
                 case Void:
-                    return IrType.VOID;
+                    return IrType.Atomic.Void;
                 case Boolean:
-                    return IrType.BOOLEAN;
+                    return IrType.Atomic.Boolean;
                 case String:
-                    return IrType.STRING;
+                    return IrType.Reference.String;
                 case Integer:
-                    return IrType.INTEGER;
+                    return IrType.Atomic.Integer;
                 case Character:
-                    return IrType.CHARACTER;
+                    return IrType.Atomic.Character;
                 case FloatingPoint:
-                    return IrType.FLOATING_POINT;
+                    return IrType.Atomic.FloatingPoint;
                 default:
                     final String message = "Unexpected enum value";
                     throw new IllegalArgumentException(message);
@@ -38,8 +36,24 @@ public class IrGenVisitor implements IAstVisitor<IrTemp> {
         } else {
             assert typeNode instanceof ArrayType;
             final ArrayType arrayType = (ArrayType) typeNode;
-            final TypeNode elementType = arrayType.getType();
-            return IrType.arrayOf(convertType(elementType));
+            final Type elementType = arrayType.getType();
+
+            assert Type.Name.values().length == 6;
+            switch (elementType.getName()) {
+                case Boolean:
+                    return IrType.Reference.BooleanArray;
+                case String:
+                    return IrType.Reference.StringArray;
+                case Integer:
+                    return IrType.Reference.IntegerArray;
+                case Character:
+                    return IrType.Reference.CharacterArray;
+                case FloatingPoint:
+                    return IrType.Reference.FloatingPointArray;
+                default:
+                    final String message = "Unexpected enum value";
+                    throw new IllegalArgumentException(message);
+            }
         }
     }
 
@@ -51,9 +65,11 @@ public class IrGenVisitor implements IAstVisitor<IrTemp> {
     private final String mProgramName;
 
     private final Environment<String, IrTemp> mVariableEnvironment = new Environment<>();
+    private final Map<String, IrType> mFunctionReturnTypes = new HashMap<>();
     private final List<IrFunction> mFunctions = new LinkedList<>();
 
     private TemporaryFactory mTempFactory = null;
+    private LabelFactory mLabelFactory = null;
     private List<IInstruction> mInstructionList = null;
     private IrProgram mProgram = null;
 
@@ -73,15 +89,28 @@ public class IrGenVisitor implements IAstVisitor<IrTemp> {
 
     @Override
     public IrTemp visit(FunctionList functions) {
+
+        // Initialize the return type map so that functions
+        // can call one another within the next loop.
+        for (Function function : functions.getElements()) {
+            final FunctionDeclaration declaration = function.getDeclaration();
+            final String name = declaration.getId().getText();
+            final TypeNode astType = declaration.getTypeNode();
+            final IrType returnType = convertType(astType);
+            mFunctionReturnTypes.put(name, returnType);
+        }
+
         for (Function function : functions.getElements()) {
             function.accept(this);
         }
+
         return null;
     }
 
     @Override
     public IrTemp visit(Function function) {
         mTempFactory = new TemporaryFactory();
+        mLabelFactory = new LabelFactory();
         mInstructionList = new LinkedList<>();
         mVariableEnvironment.beginScope();
 
@@ -106,6 +135,7 @@ public class IrGenVisitor implements IAstVisitor<IrTemp> {
 
         mVariableEnvironment.endScope();
         mInstructionList = null;
+        mLabelFactory = null;
         mTempFactory = null;
         return null;
     }
@@ -137,7 +167,7 @@ public class IrGenVisitor implements IAstVisitor<IrTemp> {
 
     @Override
     public IrTemp visit(IntegerLiteral literal) {
-        final IrTemp temp = mTempFactory.get(IrType.INTEGER, IrTemp.Category.TEMPORARY);
+        final IrTemp temp = mTempFactory.get(IrType.Atomic.Integer, IrTemp.Category.TEMPORARY);
         final IInstruction instruction = new ConstantAssignment(temp, literal.getValue());
         mInstructionList.add(instruction);
         return temp;
@@ -145,7 +175,7 @@ public class IrGenVisitor implements IAstVisitor<IrTemp> {
 
     @Override
     public IrTemp visit(StringLiteral literal) {
-        final IrTemp temp = mTempFactory.get(IrType.STRING, IrTemp.Category.TEMPORARY);
+        final IrTemp temp = mTempFactory.get(IrType.Reference.String, IrTemp.Category.TEMPORARY);
         final IInstruction instruction = new ConstantAssignment(temp, literal.getValue());
         mInstructionList.add(instruction);
         return temp;
@@ -153,7 +183,7 @@ public class IrGenVisitor implements IAstVisitor<IrTemp> {
 
     @Override
     public IrTemp visit(FloatLiteral literal) {
-        final IrTemp temp = mTempFactory.get(IrType.FLOATING_POINT, IrTemp.Category.TEMPORARY);
+        final IrTemp temp = mTempFactory.get(IrType.Atomic.FloatingPoint, IrTemp.Category.TEMPORARY);
         final IInstruction instruction = new ConstantAssignment(temp, literal.getValue());
         mInstructionList.add(instruction);
         return temp;
@@ -161,7 +191,7 @@ public class IrGenVisitor implements IAstVisitor<IrTemp> {
 
     @Override
     public IrTemp visit(CharacterLiteral literal) {
-        final IrTemp temp = mTempFactory.get(IrType.CHARACTER, IrTemp.Category.TEMPORARY);
+        final IrTemp temp = mTempFactory.get(IrType.Atomic.Character, IrTemp.Category.TEMPORARY);
         final IInstruction instruction = new ConstantAssignment(temp, literal.getValue());
         mInstructionList.add(instruction);
         return temp;
@@ -169,7 +199,7 @@ public class IrGenVisitor implements IAstVisitor<IrTemp> {
 
     @Override
     public IrTemp visit(BooleanLiteral literal) {
-        final IrTemp temp = mTempFactory.get(IrType.BOOLEAN, IrTemp.Category.TEMPORARY);
+        final IrTemp temp = mTempFactory.get(IrType.Atomic.Boolean, IrTemp.Category.TEMPORARY);
         final IInstruction instruction = new ConstantAssignment(temp, literal.getValue());
         mInstructionList.add(instruction);
         return temp;
@@ -212,9 +242,19 @@ public class IrGenVisitor implements IAstVisitor<IrTemp> {
     @Override
     public IrTemp visit(VariableDeclaration declaration) {
         final String name = declaration.getId().getText();
-        final IrType type = convertType(declaration.getTypeNode());
-        final IrTemp temp = mTempFactory.get(type, IrTemp.Category.LOCAL);
+        final TypeNode typeNode = declaration.getTypeNode();
+        final IrType irType = convertType(typeNode);
+        final IrTemp temp = mTempFactory.get(irType, IrTemp.Category.LOCAL);
         mVariableEnvironment.put(name, temp);
+
+        if (typeNode instanceof ArrayType) {
+            final ArrayType arrayType = (ArrayType) typeNode;
+            final Type elementType = arrayType.getType();
+            final IrType irElementType = convertType(elementType);
+            final int size = arrayType.getSize().getValue();
+            final IInstruction instruction = new IrInitializeArray(irElementType, size, temp);
+            mInstructionList.add(instruction);
+        }
 
         return null;
     }
@@ -229,21 +269,79 @@ public class IrGenVisitor implements IAstVisitor<IrTemp> {
 
     @Override
     public IrTemp visit(ExpressionStatement statement) {
+        statement.getExpression().accept(this);
         return null;
     }
 
     @Override
     public IrTemp visit(IfStatement statement) {
+        final IrTemp condition = statement.getExpression().accept(this);
+        assert condition.getType() == IrType.Atomic.Boolean;
+
+        final IrTemp inverted = mTempFactory.get(condition.getType(), IrTemp.Category.TEMPORARY);
+        final IInstruction inversionInstruction = new IrInversion(inverted, condition);
+        mInstructionList.add(inversionInstruction);
+
+        final IrLabel endLabel = mLabelFactory.get();
+
+        final IInstruction conditionalJump = new ConditionalJump(inverted, endLabel);
+        mInstructionList.add(conditionalJump);
+
+        statement.getIfBlock().accept(this);
+        mInstructionList.add(endLabel);
+
         return null;
     }
 
     @Override
     public IrTemp visit(IfElseStatement statement) {
+        final IrTemp condition = statement.getExpression().accept(this);
+        assert condition.getType() == IrType.Atomic.Boolean;
+
+        final IrTemp inverted = mTempFactory.get(condition.getType(), IrTemp.Category.TEMPORARY);
+        final IInstruction inversionInstruction = new IrInversion(inverted, condition);
+        mInstructionList.add(inversionInstruction);
+
+        final IrLabel elseLabel = mLabelFactory.get();
+        final IrLabel endLabel = mLabelFactory.get();
+
+        final IInstruction conditionalJump = new ConditionalJump(inverted, elseLabel);
+        mInstructionList.add(conditionalJump);
+
+        statement.getIfBlock().accept(this);
+        final IInstruction jump = new Jump(endLabel);
+        mInstructionList.add(jump);
+
+        mInstructionList.add(elseLabel);
+        statement.getElseBlock().accept(this);
+
+        mInstructionList.add(endLabel);
+
         return null;
     }
 
     @Override
     public IrTemp visit(WhileStatement statement) {
+        final IrLabel startLabel = mLabelFactory.get();
+        final IrLabel endLabel = mLabelFactory.get();
+        mInstructionList.add(startLabel);
+
+        final IrTemp condition = statement.getExpression().accept(this);
+        assert condition.getType() == IrType.Atomic.Boolean;
+
+        final IrTemp inverted = mTempFactory.get(condition.getType(), IrTemp.Category.TEMPORARY);
+        final IInstruction inversionInstruction = new IrInversion(inverted, condition);
+        mInstructionList.add(inversionInstruction);
+
+        final IInstruction conditionalJump = new ConditionalJump(inverted, endLabel);
+        mInstructionList.add(conditionalJump);
+
+        statement.getBlock().accept(this);
+        final IInstruction jump = new Jump(startLabel);
+        mInstructionList.add(jump);
+
+        mInstructionList.add(endLabel);
+
         return null;
     }
 
@@ -267,6 +365,18 @@ public class IrGenVisitor implements IAstVisitor<IrTemp> {
 
     @Override
     public IrTemp visit(ReturnStatement statement) {
+        final Optional<Expression> possibleExpression = statement.getExpression();
+
+        final IInstruction instruction;
+        if (possibleExpression.isPresent()) {
+            final Expression expression = possibleExpression.get();
+            final IrTemp temp = expression.accept(this);
+            instruction = new IrReturn(Optional.of(temp));
+        } else {
+            instruction = new IrReturn(Optional.empty());
+        }
+
+        mInstructionList.add(instruction);
         return null;
     }
 
@@ -287,57 +397,135 @@ public class IrGenVisitor implements IAstVisitor<IrTemp> {
 
     @Override
     public IrTemp visit(ArrayAssignment assignment) {
+        final IrTemp index = assignment.getIndex().accept(this);
+        final IrTemp value = assignment.getAssignment().accept(this);
+
+        final String arrayName = assignment.getId().getText();
+        final Optional<IrTemp> arrayTemp = mVariableEnvironment.get(arrayName);
+        assert arrayTemp.isPresent();
+
+        final IInstruction instruction = new IrArrayAssignment(arrayTemp.get(), index, value);
+        mInstructionList.add(instruction);
+
         return null;
     }
 
     @Override
     public IrTemp visit(Block block) {
+        block.getStatements().accept(this);
         return null;
+    }
+
+    private interface BinaryOperationFactory {
+        BinaryOperation create(IrTemp result, IrTemp left, IrTemp right);
+    }
+
+    private IrTemp convertBooleanOperatorExpression(OperatorExpression expression, BinaryOperationFactory factory) {
+        final IrTemp left = expression.getLeftSide().accept(this);
+        final IrTemp right = expression.getRightSide().accept(this);
+
+        final IrTemp result = mTempFactory.get(IrType.Atomic.Boolean, IrTemp.Category.TEMPORARY);
+        final IInstruction instruction = factory.create(result, left, right);
+        mInstructionList.add(instruction);
+
+        return result;
     }
 
     @Override
     public IrTemp visit(EqualityExpression expression) {
-        return null;
+        return convertBooleanOperatorExpression(expression, IrEquality::new);
     }
 
     @Override
     public IrTemp visit(LessThanExpression expression) {
-        return null;
+        return convertBooleanOperatorExpression(expression, IrLessThan::new);
+    }
+
+    private IrTemp convertTypedOperatorExpression(OperatorExpression expression, BinaryOperationFactory factory) {
+        final IrTemp left = expression.getLeftSide().accept(this);
+        final IrTemp right = expression.getRightSide().accept(this);
+
+        final IrTemp result = mTempFactory.get(left.getType(), IrTemp.Category.TEMPORARY);
+        final IInstruction instruction = factory.create(result, left, right);
+        mInstructionList.add(instruction);
+
+        return result;
     }
 
     @Override
     public IrTemp visit(AddExpression expression) {
-        return null;
+        return convertTypedOperatorExpression(expression, IrAdd::new);
     }
 
     @Override
     public IrTemp visit(SubtractExpression expression) {
-        return null;
+        return convertTypedOperatorExpression(expression, IrSubtract::new);
     }
 
     @Override
     public IrTemp visit(MultiplyExpression expression) {
-        return null;
+        return convertTypedOperatorExpression(expression, IrMultiply::new);
     }
 
     @Override
     public IrTemp visit(ParenExpression expression) {
-        return null;
+        return expression.getExpression().accept(this);
     }
 
     @Override
     public IrTemp visit(ArrayReference reference) {
-        return null;
+        final IrTemp index = reference.getExpression().accept(this);
+        assert index.getType() == IrType.Atomic.Integer;
+
+        final String arrayName = reference.getId().getText();
+        final Optional<IrTemp> arrayOptional = mVariableEnvironment.get(arrayName);
+        assert arrayOptional.isPresent();
+        final IrTemp array = arrayOptional.get();
+
+        final IrType arrayType = array.getType();
+        assert arrayType instanceof IrType.Reference;
+        final IrType.Reference referenceType = (IrType.Reference) arrayType;
+        final IrType elementType = referenceType.getUnderlyingType();
+        assert elementType != null;
+
+        final IrTemp temp = mTempFactory.get(elementType, IrTemp.Category.TEMPORARY);
+        final IInstruction instruction = new IrArrayAccess(temp, array, index);
+        mInstructionList.add(instruction);
+
+        return temp;
     }
 
     @Override
     public IrTemp visit(FunctionCall functionCall) {
-        return null;
+        final List<Expression> paramExpressions = functionCall.getExpressions().getElements();
+        final List<IrTemp> paramTemps = new ArrayList<>(paramExpressions.size());
+        for (Expression expression : paramExpressions) {
+            final IrTemp temp = expression.accept(this);
+            paramTemps.add(temp);
+        }
+
+        final String functionName = functionCall.getId().getText();
+        final IrType returnType = mFunctionReturnTypes.get(functionName);
+        assert returnType != null;
+
+        final IInstruction instruction;
+        final IrTemp temp;
+        if (returnType.equals(IrType.Atomic.Void)) {
+            temp = null;
+            instruction = new IrCall(functionName, paramTemps);
+        } else {
+            temp = mTempFactory.get(returnType, IrTemp.Category.TEMPORARY);
+            instruction = new IrCallWithResult(functionName, paramTemps, temp);
+        }
+
+        mInstructionList.add(instruction);
+        return temp;
     }
 
     @Override
     public IrTemp visit(ExpressionList expressionList) {
-        return null;
+        final String message = "There is no IR to generate for this statement";
+        throw new UnsupportedOperationException(message);
     }
 
 }

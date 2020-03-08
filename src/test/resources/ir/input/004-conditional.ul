@@ -1,0 +1,29 @@
+void main() {
+    int five;
+
+    five = 5;
+    foo(five);
+    foo(6);
+
+    if (bar()) {
+        print("a");
+        print("b");
+        print("c");
+    }
+}
+
+void foo(int value) {
+    if (value == 5) {
+        println "true";
+    } else {
+        println "false";
+    }
+
+    if (value == 6) {
+        println "six";
+    }
+}
+
+boolean bar() {
+    return true;
+}

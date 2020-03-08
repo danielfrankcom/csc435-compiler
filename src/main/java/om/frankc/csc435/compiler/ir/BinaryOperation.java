@@ -1,18 +1,23 @@
 package om.frankc.csc435.compiler.ir;
 
-import om.frankc.csc435.compiler.ir.visit.IIrVisitor;
+public abstract class BinaryOperation implements IInstruction {
 
-public class VariableAssignment implements IInstruction {
-
-    public VariableAssignment(IrTemp left, IrTemp right) {
+    public BinaryOperation(IrTemp result, IrTemp left, IrTemp right) {
+        assert result != null;
         assert left != null;
         assert right != null;
+        mResult = result;
         mLeft = left;
         mRight = right;
     }
 
+    private final IrTemp mResult;
     private final IrTemp mLeft;
     private final IrTemp mRight;
+
+    public IrTemp getResult() {
+        return mResult;
+    }
 
     public IrTemp getLeft() {
         return mLeft;
@@ -20,11 +25,6 @@ public class VariableAssignment implements IInstruction {
 
     public IrTemp getRight() {
         return mRight;
-    }
-
-    @Override
-    public <T> T accept(IIrVisitor<T> visitor) {
-        return visitor.visit(this);
     }
 
 }

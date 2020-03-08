@@ -2,34 +2,51 @@ package om.frankc.csc435.compiler.ir;
 
 import om.frankc.csc435.compiler.ir.visit.IIrVisitor;
 
-public final class IrType implements IIrNode {
+public interface IrType extends IIrNode {
 
-    public static IrType VOID = new IrType("V");
-    public static IrType BOOLEAN = new IrType("Z");
-    public static IrType CHARACTER = new IrType("C");
-    public static IrType INTEGER = new IrType("I");
-    public static IrType FLOATING_POINT = new IrType("F");
-    public static IrType STRING = new IrType("U");
+    enum Atomic implements IrType {
+        Boolean,
+        Character,
+        FloatingPoint,
+        Integer,
+        Void;
 
-    public static IrType arrayOf(IrType type) {
-        return new IrType("A" + type.toString());
+        @Override
+        public <T> T accept(IIrVisitor<T> visitor) {
+            return visitor.visit(this);
+        }
+
     }
 
-    private IrType(String identifier) {
-        assert identifier != null;
-        mId = identifier;
-    }
+    enum Reference implements IrType {
+        String(null),
+        BooleanArray(Atomic.Boolean),
+        CharacterArray(Atomic.Character),
+        FloatingPointArray(Atomic.FloatingPoint),
+        IntegerArray(Atomic.Integer),
+        StringArray(String);
 
-    private final String mId;
+        Reference(IrType underlyingType) {
+            mUnderlyingType = underlyingType;
+            mIsArray = underlyingType != null;
+        }
 
-    @Override
-    public final String toString() {
-        return mId;
-    }
+        private final IrType mUnderlyingType;
+        private final boolean mIsArray;
 
-    @Override
-    public <T> T accept(IIrVisitor<T> visitor) {
-        return visitor.visit(this);
+        public boolean isArray() {
+            return mIsArray;
+        }
+
+        public IrType getUnderlyingType() {
+            return mUnderlyingType;
+        }
+
+        @Override
+        public <T> T accept(IIrVisitor<T> visitor) {
+            return visitor.visit(this);
+        }
+
     }
 
 }
