@@ -37,9 +37,9 @@ Here are the locations for the relevant source files:
 
 ANTLR grammar: `src/main/antlr`
 
-Java source: `src/main/java/ca/frankc/csc435/compiler/`
+Java source: `src/main/java/ca/frankcom/csc435/compiler/`
 
-Java test source: `src/test/java/ca/frankc/csc435/compiler/`
+Java test source: `src/test/java/ca/frankcom/csc435/compiler/`
 
 Java test resources: `src/test/resources/`
 

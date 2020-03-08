@@ -3,7 +3,7 @@ plugins {
     id 'antlr'
 }
 
-group 'om.frankc.csc435'
+group 'ca.frankcom.csc435'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -30,7 +30,7 @@ jar {
     manifest {
         attributes 'Implementation-Title': 'CSC 435 Toy Compiler',
                 'Implementation-Version': '0.1',
-                'Main-Class': 'om.frankc.csc435.compiler.Compiler'
+                'Main-Class': 'ca.frankcom.csc435.compiler.Compiler'
     }
     archiveFileName = "csc435-compiler.jar"
     from {

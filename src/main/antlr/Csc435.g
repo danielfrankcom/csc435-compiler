@@ -6,9 +6,9 @@ options {
 }
 
 @parser::header {
-    package om.frankc.csc435.compiler.generated;
+    package ca.frankcom.csc435.compiler.generated;
 
-    import om.frankc.csc435.compiler.ast.*;
+    import ca.frankcom.csc435.compiler.ast.*;
 
 	import java.util.*;
 
@@ -18,7 +18,7 @@ options {
 }
 
 @lexer::header {
-    package om.frankc.csc435.compiler.generated;
+    package ca.frankcom.csc435.compiler.generated;
 }
 				
 @parser::members {
