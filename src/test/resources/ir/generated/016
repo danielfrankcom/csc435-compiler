@@ -20,4 +20,5 @@ FUNC main ()V
         T1 := 3;
         T2 := CALL foo(T0T1);
         PRINTLNI T2;
+        RETURN;
 }

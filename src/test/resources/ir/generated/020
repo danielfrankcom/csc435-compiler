@@ -27,4 +27,5 @@ FUNC main ()V
         T10 := T8 I+ T9;
         T2 := T10;
         PRINTLNI T2;
+        RETURN;
 }

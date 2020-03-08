@@ -24,7 +24,7 @@ import java.util.function.Consumer;
 public class Compiler {
 
     private static void printHelp(Options options) {
-        new HelpFormatter().printHelp("commandName [OPTIONS] <FILE>", options);
+        new HelpFormatter().printHelp("compile [OPTIONS] <FILE>", options);
     }
 
     public static void main(String[] args) throws Exception {
@@ -68,7 +68,10 @@ public class Compiler {
         }
 
         final List<String> remainingArgs = commandLine.getArgList();
-        if (remainingArgs.size() != 1) {
+        if (remainingArgs.size() <= 0) {
+            printHelp(options);
+            return;
+        } else if (remainingArgs.size() != 1) {
             System.out.println("Too many arguments provided.\n");
             printHelp(options);
             return;
@@ -79,9 +82,11 @@ public class Compiler {
         final String inputFileName = inputFile.getName();
         final InputStream input = new FileInputStream(inputFile);
 
+        final String programName = inputFileName.replaceAll(".ul|[^a-zA-Z]", "");
+
         // This may throw other exceptions, but we want to fail fast so we let them go.
         try {
-            compile(inputFileName, input, prettyPrintOutput, irGenOutput, true);
+            compile(programName, input, prettyPrintOutput, irGenOutput, true);
         } catch (SemanticException e) {
             System.out.println(e.toString());
 

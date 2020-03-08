@@ -18,4 +18,5 @@ FUNC main ()V
         T5 := T3 I* T4;
         T6 := T2 I+ T5;
         PRINTLNI T6;
+        RETURN;
 }

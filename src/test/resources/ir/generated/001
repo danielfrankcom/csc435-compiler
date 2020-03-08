@@ -66,4 +66,5 @@ FUNC main ()V
         PRINTZ T19;
         T20 := "";
         PRINTLNU T20;
+        RETURN;
 }

@@ -16,6 +16,7 @@ FUNC less (II)V
         PRINTU T4;
     L0:;
         PRINTLNI T1;
+        RETURN;
 }
 
 FUNC main ()V
@@ -26,4 +27,5 @@ FUNC main ()V
         T0 := 2;
         T1 := 3;
         CALL less(T0T1);
+        RETURN;
 }

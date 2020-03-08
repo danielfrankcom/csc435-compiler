@@ -26,6 +26,7 @@ FUNC main ()V
         T7 := "c";
         PRINTU T7;
     L0:;
+        RETURN;
 }
 
 FUNC foo (I)V
@@ -59,6 +60,7 @@ FUNC foo (I)V
         T9 := "six";
         PRINTLNU T9;
     L2:;
+        RETURN;
 }
 
 FUNC bar ()Z

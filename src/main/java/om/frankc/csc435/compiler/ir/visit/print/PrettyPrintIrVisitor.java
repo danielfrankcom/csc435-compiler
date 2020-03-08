@@ -141,6 +141,10 @@ public class PrettyPrintIrVisitor implements IIrVisitor<Void> {
             instruction.accept(this);
         }
 
+        if (function.getReturnType().equals(IrType.Atomic.Void)) {
+            println("RETURN;");
+        }
+
         mIndentationLevel -= 2;
         println("}");
 

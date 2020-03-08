@@ -58,6 +58,7 @@ FUNC main ()V
         T2[T20] := T21;
         T22 := CALL foo(T2T1);
         PRINTLNU T22;
+        RETURN;
 }
 
 FUNC foo (AUAF)U

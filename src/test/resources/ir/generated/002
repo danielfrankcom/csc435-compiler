@@ -29,6 +29,7 @@ FUNC main ()V
         T9 := CALL bar(T1T2);
         T3 := T9;
         PRINTLNU T3;
+        RETURN;
 }
 
 FUNC foo (I)I
@@ -58,4 +59,5 @@ FUNC baz ()V
 
         T0 := "extra function";
         PRINTLNU T0;
+        RETURN;
 }

@@ -37,4 +37,5 @@ FUNC main ()V
         T0 := 2;
         T1 := 2;
         T2 := CALL foo(T0T1);
+        RETURN;
 }

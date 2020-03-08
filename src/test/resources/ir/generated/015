@@ -30,4 +30,5 @@ FUNC main ()V
         T8 := 10;
         T9 := T0 I+ T8;
         T0 := T9;
+        RETURN;
 }

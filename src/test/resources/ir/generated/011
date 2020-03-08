@@ -41,4 +41,5 @@ FUNC main ()V
         T1 := 8;
         T2 := CALL factorial(T1);
         PRINTLNI T2;
+        RETURN;
 }

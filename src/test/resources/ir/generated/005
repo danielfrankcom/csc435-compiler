@@ -25,4 +25,5 @@ FUNC main ()V
         T0 := T1;
         GOTO L0;
     L1:;
+        RETURN;
 }

@@ -21,4 +21,5 @@ FUNC main ()V
         T6 := T1 I+ T5;
         T7 := 2;
         T0[T6] := T7;
+        RETURN;
 }
