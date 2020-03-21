@@ -1,20 +1,21 @@
 
 package ca.frankcom.csc435.compiler;
 
+import ca.frankcom.csc435.compiler.ast.Program;
 import ca.frankcom.csc435.compiler.ast.visit.IAstVisitor;
+import ca.frankcom.csc435.compiler.ast.visit.irgen.IrGenVisitor;
 import ca.frankcom.csc435.compiler.ast.visit.print.PrettyPrintAstVisitor;
 import ca.frankcom.csc435.compiler.ast.visit.semantic.SemanticCheckVisitor;
 import ca.frankcom.csc435.compiler.ast.visit.semantic.SemanticException;
+import ca.frankcom.csc435.compiler.generated.Csc435Lexer;
+import ca.frankcom.csc435.compiler.generated.Csc435Parser;
 import ca.frankcom.csc435.compiler.ir.IrProgram;
 import ca.frankcom.csc435.compiler.ir.visit.IIrVisitor;
 import ca.frankcom.csc435.compiler.ir.visit.print.PrettyPrintIrVisitor;
-import ca.frankcom.csc435.compiler.ast.Program;
-import ca.frankcom.csc435.compiler.ast.visit.irgen.IrGenVisitor;
-import ca.frankcom.csc435.compiler.generated.Csc435Lexer;
-import ca.frankcom.csc435.compiler.generated.Csc435Parser;
 import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.apache.commons.cli.*;
+import org.apache.commons.text.WordUtils;
 
 import java.io.*;
 import java.util.LinkedList;
@@ -82,7 +83,11 @@ public class Compiler {
         final String inputFileName = inputFile.getName();
         final InputStream input = new FileInputStream(inputFile);
 
-        final String programName = inputFileName.replaceAll(".ul|[^a-zA-Z]", "");
+        String programName = inputFileName.replaceAll(".ul|[^a-zA-Z]", "");
+        if (programName.length() == 0) {
+            programName = "program";
+        }
+        programName = WordUtils.capitalize(programName);
 
         // This may throw other exceptions, but we want to fail fast so we let them go.
         try {
