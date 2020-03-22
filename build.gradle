@@ -16,11 +16,11 @@ dependencies {
 
     antlr 'org.antlr:antlr:3.5.2'
 
+    compile 'ca.mcgill.sable:soot:4.1.0'
     compile 'com.google.guava:guava:28.2-jre'
     compile 'commons-cli:commons-cli:1.4'
     compile 'org.apache.commons:commons-text:1.8'
 
-    testCompile 'ca.mcgill.sable:soot:4.1.0'
     testCompile 'commons-io:commons-io:2.6'
     testCompile 'junit:junit:4.12'
     testCompile 'org.apache.commons:commons-lang3:3.9'

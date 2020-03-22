@@ -141,10 +141,6 @@ public class PrettyPrintIrVisitor implements IIrVisitor<Void> {
             instruction.accept(this);
         }
 
-        if (function.getReturnType().equals(IrType.Atomic.Void)) {
-            println("RETURN;");
-        }
-
         mIndentationLevel -= 2;
         println("}");
 
@@ -282,7 +278,7 @@ public class PrettyPrintIrVisitor implements IIrVisitor<Void> {
     public Void visit(ConstantAssignment instruction) {
         instruction.getOperand().accept(this);
         print(" := ");
-        print(instruction.getConstant());
+        print(instruction.getValue().toString());
         println(";");
 
         return null;

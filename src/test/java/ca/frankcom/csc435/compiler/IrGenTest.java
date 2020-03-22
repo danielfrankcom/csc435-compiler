@@ -19,12 +19,11 @@ import static org.junit.Assert.*;
 
 public class IrGenTest {
 
-    private static final ClassLoader CLASS_LOADER = ParseTest.class.getClassLoader();
+    private static final ClassLoader CLASS_LOADER = IrGenTest.class.getClassLoader();
     private static final String TEST_FOLDER = "ir";
 
     private enum Group {
         input,
-        generated,
         output
     }
 
@@ -73,13 +72,13 @@ public class IrGenTest {
      *
      * @return The generated {@link ImmutableMap}.
      */
-    private static ImmutableMap<File, File> getTestFiles(Group valueType) {
+    private static ImmutableMap<File, File> getTestFiles() {
         final Map<File, File> result = new HashMap<>();
 
         final File[] inputs = getTestFilesForGroup(Group.input);
         final ImmutableMap<Integer, File> inputMap = identifyTestFiles(inputs);
 
-        final File[] outputs = getTestFilesForGroup(valueType);
+        final File[] outputs = getTestFilesForGroup(Group.output);
         final ImmutableMap<Integer, File> outputMap = identifyTestFiles(outputs);
 
         assertEquals(inputMap.size(), outputMap.size());
@@ -98,7 +97,7 @@ public class IrGenTest {
     @Test
     public void testIrGeneration() throws Exception {
 
-        final ImmutableMap<File, File> testFiles = getTestFiles(Group.generated);
+        final ImmutableMap<File, File> testFiles = getTestFiles();
 
         for (Map.Entry<File, File> entry : testFiles.entrySet()) {
             final File input = entry.getKey();
@@ -117,7 +116,8 @@ public class IrGenTest {
 
             boolean success = false;
             try {
-                Compiler.compile("test", inputStream, null, outputStream, true);
+                Compiler.compile("test", inputStream, null, outputStream,
+                        null, null, true);
 
                 // The above line will not throw an exception if successful,
                 // but will also not return a result. We double check that
@@ -133,108 +133,6 @@ public class IrGenTest {
             final String actualText = FileUtils.readFileToString(output, Charset.defaultCharset());
 
             assertEquals(expectedText, actualText);
-        }
-    }
-
-    private static void writeOutputTo(Process process, String filePath) throws Exception {
-        final BufferedReader outputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        final File codeGenFile = new File(filePath);
-        final BufferedWriter outputWriter = new BufferedWriter(new FileWriter(codeGenFile));
-        String line;
-        while ((line = outputReader.readLine()) != null) {
-            outputWriter.write(line + "\n");
-        }
-        outputWriter.close();
-        process.waitFor();
-    }
-
-    /**
-     * This test will be ignored until the remainder of the code generation has been completed, as in its current state
-     * it relies on a provided binary file that contains bugs and does not work on all system architectures.
-     */
-    @Ignore
-    @Test
-    public void testExecution() throws Exception {
-
-        // Provided codegen executable seems to be compiled for a specific
-        // architecture and will fail the test when running on ARM. Skip
-        // the test if we detect an invalid architecture.
-        final String architecture = System.getProperty("os.arch");
-        if ("arm".equals(architecture)) {
-            return;
-        }
-
-        final ImmutableMap<File, File> testFiles = getTestFiles(Group.output);
-
-        for (Map.Entry<File, File> entry : testFiles.entrySet()) {
-            final File input = entry.getKey();
-            final String inputPath = input.getAbsolutePath();
-            final InputStream inputStream = new FileInputStream(input);
-
-            final File expected = entry.getValue();
-            final String expectedPath = expected.getAbsolutePath();
-
-            final File tempFile = File.createTempFile("compilerTest", "");
-            final String tempPath = tempFile.getAbsolutePath();
-            final String irPath = tempPath + ".ir";
-            final String codeGenPath = tempPath + ".j";
-            final String jasminPath = tempPath + ".jasmin";
-            final String outPath = tempPath + ".out";
-
-            final OutputStream irStream = new FileOutputStream(irPath);
-
-            System.out.printf("Testing '%s' -> '%s' -> '%s'\n", inputPath, tempPath, expectedPath);
-
-            boolean success = false;
-            try {
-
-                // Compile from source to IR.
-                Compiler.compile("test", inputStream, null, irStream, true);
-
-                // This file is a black-box test tool provided by the instructor, so cannot
-                // be pulled from external resources. The binary is stored in the repo.
-                final URL codeGenUrl = CLASS_LOADER.getResource("ir/codegen");
-                final String codeGenExecutable = codeGenUrl.getPath();
-
-                final String codeGenCommand = String.format("%s --file=%s", codeGenExecutable, irPath);
-                System.out.println("Executing codegen.");
-                final Process codeGenProcess = Runtime.getRuntime().exec(codeGenCommand);
-                writeOutputTo(codeGenProcess, codeGenPath);
-
-                // Convert from codegen output to class file.
-                final String[] jasminArgs = {codeGenPath, "-d", jasminPath};
-                System.out.println("Executing jasmin.");
-                Main.main(jasminArgs);
-
-                final String javaCommand = String.format("java -cp %s test", jasminPath);
-                System.out.println("Executing java.");
-                final Process javaProcess = Runtime.getRuntime().exec(javaCommand);
-                writeOutputTo(javaProcess, outPath);
-
-                // The above lines will not throw an exception if successful,
-                // but will also not return a result. We double check that
-                // we get past those lines for the sake of the unit test.
-                success = true;
-
-            } catch (Throwable e) {
-                throw new RuntimeException(e);
-            }
-
-            assertTrue(success);
-
-            final File output = new File(outPath);
-            final String expectedText = FileUtils.readFileToString(expected, Charset.defaultCharset());
-            final String actualText = FileUtils.readFileToString(output, Charset.defaultCharset());
-
-            try {
-                assertEquals(expectedText, actualText);
-            } finally {
-                Files.deleteIfExists(Paths.get(tempPath));
-                Files.deleteIfExists(Paths.get(irPath));
-                Files.deleteIfExists(Paths.get(codeGenPath));
-                Files.deleteIfExists(Paths.get(outPath));
-                FileUtils.forceDelete(new File(jasminPath));
-            }
         }
     }
 

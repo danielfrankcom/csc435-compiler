@@ -43,7 +43,8 @@ public class ParseTest {
 
     private static void compile(File inputFile) throws Exception {
         final InputStream input = new FileInputStream(inputFile);
-        Compiler.compile("", input, null, null, false);
+        Compiler.compile("", input, null, null,
+                null, null, false);
     }
 
     @Test

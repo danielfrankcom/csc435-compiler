@@ -130,7 +130,8 @@ public class AstTest {
 
             boolean success = false;
             try {
-                Compiler.compile("", inputStream, outputStream, null, false);
+                Compiler.compile("", inputStream, outputStream, null,
+                        null, null, false);
 
                 // The above line will not throw an exception if successful,
                 // but will also not return a result. We double check that

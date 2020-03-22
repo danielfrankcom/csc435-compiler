@@ -1,1 +1,24 @@
-5
+PROG test
+
+FUNC foo (II)I
+{
+    TEMP 0:I;
+    TEMP 1:I;
+    TEMP 2:I;
+
+        T2 := T0 I+ T1;
+        RETURN T2;
+}
+
+FUNC main ()V
+{
+    TEMP 0:I;
+    TEMP 1:I;
+    TEMP 2:I;
+
+        T0 := 2;
+        T1 := 3;
+        T2 := CALL foo(T0T1);
+        PRINTLNI T2;
+        RETURN;
+}

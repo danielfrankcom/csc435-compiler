@@ -57,7 +57,8 @@ public class SemanticTest {
 
         System.out.printf("Testing '%s'\n", file.getName());
 
-        Compiler.compile("", input, null, null, true);
+        Compiler.compile("", input, null, null,
+                null, null, true);
     }
 
     @Test

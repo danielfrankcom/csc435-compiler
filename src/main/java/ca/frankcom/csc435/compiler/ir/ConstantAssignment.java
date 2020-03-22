@@ -4,7 +4,7 @@ import ca.frankcom.csc435.compiler.ir.visit.IIrVisitor;
 
 public class ConstantAssignment implements IInstruction {
 
-    private static abstract class Value {
+    public static abstract class Value {
 
         @Override
         public abstract String toString();
@@ -25,8 +25,8 @@ public class ConstantAssignment implements IInstruction {
         return mOperand;
     }
 
-    public String getConstant() {
-        return mConstant.toString();
+    public Value getValue() {
+        return mConstant;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class ConstantAssignment implements IInstruction {
         this(operand, new IntegerValue(constant));
     }
 
-    private static class IntegerValue extends Value {
+    public static class IntegerValue extends Value {
 
         IntegerValue(int value) {
             mValue = value;
@@ -46,17 +46,22 @@ public class ConstantAssignment implements IInstruction {
 
         private final int mValue;
 
+        public int get() {
+            return mValue;
+        }
+
         @Override
         public String toString() {
             return Integer.toString(mValue);
         }
+
     }
 
     public ConstantAssignment(IrTemp operand, float constant) {
         this(operand, new FloatValue(constant));
     }
 
-    private static class FloatValue extends Value {
+    public static class FloatValue extends Value {
 
         FloatValue(float value) {
             mValue = value;
@@ -64,17 +69,22 @@ public class ConstantAssignment implements IInstruction {
 
         private final float mValue;
 
+        public float get() {
+            return mValue;
+        }
+
         @Override
         public String toString() {
             return Float.toString(mValue);
         }
+
     }
 
     public ConstantAssignment(IrTemp operand, char constant) {
         this(operand, new CharValue(constant));
     }
 
-    private static class CharValue extends Value {
+    public static class CharValue extends Value {
 
         CharValue(char value) {
             mValue = value;
@@ -82,35 +92,45 @@ public class ConstantAssignment implements IInstruction {
 
         private final char mValue;
 
+        public char get() {
+            return mValue;
+        }
+
         @Override
         public String toString() {
             return "'" + mValue + "'";
         }
+
     }
 
     public ConstantAssignment(IrTemp operand, boolean constant) {
-        this(operand, new BoolValue(constant));
+        this(operand, new BooleanValue(constant));
     }
 
-    private static class BoolValue extends Value {
+    public static class BooleanValue extends Value {
 
-        BoolValue(boolean value) {
+        BooleanValue(boolean value) {
             mValue = value;
         }
 
         private final boolean mValue;
 
+        public boolean get() {
+            return mValue;
+        }
+
         @Override
         public String toString() {
             return Boolean.toString(mValue).toUpperCase();
         }
+
     }
 
     public ConstantAssignment(IrTemp operand, String constant) {
         this(operand, new StringValue(constant));
     }
 
-    private static class StringValue extends Value {
+    public static class StringValue extends Value {
 
         StringValue(String value) {
             mValue = value;
@@ -118,10 +138,15 @@ public class ConstantAssignment implements IInstruction {
 
         private final String mValue;
 
+        public String get() {
+            return mValue;
+        }
+
         @Override
         public String toString() {
             return "\"" + mValue + "\"";
         }
+
     }
 
 }

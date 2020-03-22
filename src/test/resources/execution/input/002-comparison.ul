@@ -1,0 +1,12 @@
+void main() {
+    println 1 == 4;
+    println 5 == 5;
+    println "t" == "to";
+    println "too" == "too";
+    println 't' == 'o';
+    println 'e' == 'e';
+    println 8.9 == 9.999;
+    println 1.1 == 1.10;
+    println true == false;
+    println false == false;
+}

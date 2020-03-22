@@ -107,6 +107,23 @@ public class IrGenVisitor implements IAstVisitor<IrTemp> {
         return null;
     }
 
+    /**
+     * Return statements in 'void' functions are optional in our language, but necessary in the IR.
+     *
+     * @param returnType The return type of the current function.
+     * @return {@code true} if a 'return' statement should be added, {@code false} otherwise.
+     */
+    private boolean isManualReturnNeeded(IrType returnType) {
+        final boolean isVoid = returnType.equals(IrType.Atomic.Void);
+
+        final int numInstructions = mInstructionList.size();
+        final int lastInstruction = numInstructions - 1;
+        final boolean missingReturn = numInstructions == 0 ||
+                mInstructionList.get(lastInstruction) instanceof IrReturn == false;
+
+        return isVoid && missingReturn;
+    }
+
     @Override
     public IrTemp visit(Function function) {
         mTempFactory = new TemporaryFactory();
@@ -120,6 +137,10 @@ public class IrGenVisitor implements IAstVisitor<IrTemp> {
         final FunctionDeclaration declaration = function.getDeclaration();
         final String functionName = declaration.getId().getText();
         final IrType returnType = convertType(declaration.getTypeNode());
+
+        if (isManualReturnNeeded(returnType)) {
+            mInstructionList.add(new IrReturn(Optional.empty()));
+        }
 
         final FormalParameterList paramList = declaration.getParamList();
         final List<IrType> paramTypes = new LinkedList<>();
@@ -418,6 +439,7 @@ public class IrGenVisitor implements IAstVisitor<IrTemp> {
 
     private interface BinaryOperationFactory {
         BinaryOperation create(IrTemp result, IrTemp left, IrTemp right);
+
     }
 
     private IrTemp convertBooleanOperatorExpression(OperatorExpression expression, BinaryOperationFactory factory) {

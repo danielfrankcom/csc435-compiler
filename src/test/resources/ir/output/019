@@ -1,15 +1,68 @@
-Move disk 1 from rod A to rod B
-Move disk 2 from rod A to rod C
-Move disk 1 from rod B to rod C
-Move disk 3 from rod A to rod B
-Move disk 1 from rod C to rod A
-Move disk 2 from rod C to rod B
-Move disk 1 from rod A to rod B
-Move disk 4 from rod A to rod C
-Move disk 1 from rod B to rod C
-Move disk 2 from rod B to rod A
-Move disk 1 from rod C to rod A
-Move disk 3 from rod B to rod C
-Move disk 1 from rod A to rod B
-Move disk 2 from rod A to rod C
-Move disk 1 from rod B to rod C
+PROG test
+
+FUNC towersOfHanoi (ICCC)V
+{
+    TEMP 0:I;
+    TEMP 1:C;
+    TEMP 2:C;
+    TEMP 3:C;
+    TEMP 4:I;
+    TEMP 5:Z;
+    TEMP 6:Z;
+    TEMP 7:U;
+    TEMP 8:U;
+    TEMP 9:I;
+    TEMP 10:I;
+    TEMP 11:U;
+    TEMP 12:U;
+    TEMP 13:U;
+    TEMP 14:I;
+    TEMP 15:I;
+
+        T4 := 1;
+        T5 := T0 I== T4;
+        T6 := Z! T5;
+        IF T6 GOTO L0;
+        T7 := "Move disk 1 from rod ";
+        PRINTU T7;
+        PRINTC T1;
+        T8 := " to rod ";
+        PRINTU T8;
+        PRINTLNC T2;
+        GOTO L1;
+    L0:;
+        T9 := 1;
+        T10 := T0 I- T9;
+        CALL towersOfHanoi(T10T1T3T2);
+        T11 := "Move disk ";
+        PRINTU T11;
+        PRINTI T0;
+        T12 := " from rod ";
+        PRINTU T12;
+        PRINTC T1;
+        T13 := " to rod ";
+        PRINTU T13;
+        PRINTLNC T2;
+        T14 := 1;
+        T15 := T0 I- T14;
+        CALL towersOfHanoi(T15T3T2T1);
+    L1:;
+        RETURN;
+}
+
+FUNC main ()V
+{
+    TEMP 0:I;
+    TEMP 1:I;
+    TEMP 2:C;
+    TEMP 3:C;
+    TEMP 4:C;
+
+        T1 := 4;
+        T0 := T1;
+        T2 := 'A';
+        T3 := 'C';
+        T4 := 'B';
+        CALL towersOfHanoi(T0T2T3T4);
+        RETURN;
+}
