@@ -1,0 +1,31 @@
+void main() {
+    int x;
+    string one;
+    string two;
+    string result;
+
+    x = 2;
+    println x;
+    x = foo(x);
+    println x;
+    println foo(x);
+
+    baz();
+
+    one = "str";
+    two = "ing";
+    result = bar(one, two);
+    println result;
+}
+
+int foo(int x) {
+    return x + 1;
+}
+
+string bar(string one, string two) {
+    return one + two;
+}
+
+void baz() {
+    println "extra function";
+}

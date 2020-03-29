@@ -1,0 +1,12 @@
+void main() {
+    int value;
+    int incremented;
+    value = 0;
+
+    while (value < 10) {
+        incremented = value + 1;
+        println incremented;
+        value = incremented;
+    }
+
+}

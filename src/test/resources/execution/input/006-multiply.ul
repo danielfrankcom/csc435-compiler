@@ -1,0 +1,4 @@
+void main() {
+    println 2 * 4;
+    println 7.9 * 5.4;
+}

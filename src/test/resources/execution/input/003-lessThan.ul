@@ -1,0 +1,18 @@
+void main() {
+    int val;
+
+    val = 1;
+    println val < 10;
+    println 10 < val;
+
+    println 1 < 4;
+    println 4 < 1;
+    println 8.9 < 9.999;
+    println 9.999 < 8.9;
+    println 'a' < 'b';
+    println 'b' < 'a';
+    println "t" < "to";
+    println "to" < "t";
+    println false < true;
+    println true < false;
+}

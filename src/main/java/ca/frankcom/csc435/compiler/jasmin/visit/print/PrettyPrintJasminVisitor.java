@@ -154,6 +154,36 @@ public class PrettyPrintJasminVisitor implements IJasminVisitor<Void> {
         }
     }
 
+    private static String convertArrayType(JType.UniversalType type) {
+        assert type != null;
+        assert type instanceof JType.UniversalType;
+        final JType.Universal universalType = (JType.Universal) type;
+
+        final String output;
+        switch (universalType) {
+            case Integer:
+                output = "int";
+                break;
+            case FloatingPoint:
+                output = "float";
+                break;
+            case Character:
+                output = "char";
+                break;
+            case Boolean:
+                output = "boolean";
+                break;
+            case String:
+                output = "java/lang/String";
+                break;
+            default:
+                final String message = "Unexpected type";
+                throw new IllegalArgumentException(message);
+        }
+
+        return output;
+    }
+
     @Override
     public Void visit(JProgram program) {
         final String programName = program.getName();
@@ -274,8 +304,31 @@ public class PrettyPrintJasminVisitor implements IJasminVisitor<Void> {
     }
 
     @Override
+    public Void visit(JDuplicateTopOfStack instruction) {
+        println("dup");
+
+        return null;
+    }
+
+    @Override
     public Void visit(JIfZero instruction) {
         print("ifeq ");
+        println(instruction.getSuccessLabel().toString());
+
+        return null;
+    }
+
+    @Override
+    public Void visit(JIfLessThanZero instruction) {
+        print("iflt ");
+        println(instruction.getSuccessLabel().toString());
+
+        return null;
+    }
+
+    @Override
+    public Void visit(JIfGreaterThanZero instruction) {
+        print("ifgt ");
         println(instruction.getSuccessLabel().toString());
 
         return null;
@@ -306,8 +359,99 @@ public class PrettyPrintJasminVisitor implements IJasminVisitor<Void> {
     }
 
     @Override
+    public Void visit(JInvokeInstruction instruction) {
+        print("invokestatic ");
+        print(instruction.getProgramName());
+        print("/");
+        print(instruction.getFunctionName());
+
+        print("(");
+        for (JType.UniversalType type : instruction.getParamTypes()) {
+            print(convertType(type));
+        }
+        print(")");
+
+        println(convertType(instruction.getReturnType()));
+
+        return null;
+    }
+
+    @Override
     public Void visit(JLoadPrintStream instruction) {
         println("getstatic java/lang/System/out Ljava/io/PrintStream;");
+        return null;
+    }
+
+    @Override
+    public Void visit(JStringBuilderNew instruction) {
+        println("new java/lang/StringBuilder");
+        return null;
+    }
+
+    @Override
+    public Void visit(JStringBuilderInit instruction) {
+        println("invokespecial java/lang/StringBuilder/<init>()V");
+        return null;
+    }
+
+    @Override
+    public Void visit(JStringBuilderAppend instruction) {
+        println("invokevirtual java/lang/StringBuilder/append(Ljava/lang/String;)Ljava/lang/StringBuilder;");
+        return null;
+    }
+
+    @Override
+    public Void visit(JStringBuilderOutput instruction) {
+        println("invokevirtual java/lang/StringBuilder/toString()Ljava/lang/String;");
+        return null;
+    }
+
+    @Override
+    public Void visit(JStringCompare instruction) {
+        println("invokevirtual java/lang/String/compareTo(Ljava/lang/String;)I");
+        return null;
+    }
+
+    @Override
+    public Void visit(JArrayNew instruction) {
+        final JArrayType arrayType = instruction.getArrayType();
+        if (arrayType.equals(JArrayType.Address)) {
+            print("anewarray ");
+        } else {
+            assert arrayType.equals(JArrayType.Primitive);
+            print("newarray ");
+        }
+
+        final JType.UniversalType elementType = instruction.getElementType();
+        final String type = convertArrayType(elementType);
+        println(type);
+
+        return null;
+    }
+
+    @Override
+    public Void visit(JArrayStore instruction) {
+        final JArrayType arrayType = instruction.getArrayType();
+        if (arrayType.equals(JArrayType.Address)) {
+            println("aastore");
+        } else {
+            assert arrayType.equals(JArrayType.Primitive);
+            println("iastore");
+        }
+
+        return null;
+    }
+
+    @Override
+    public Void visit(JArrayLoad instruction) {
+        final JArrayType arrayType = instruction.getArrayType();
+        if (arrayType.equals(JArrayType.Address)) {
+            println("aaload");
+        } else {
+            assert arrayType.equals(JArrayType.Primitive);
+            println("iaload");
+        }
+
         return null;
     }
 
@@ -379,21 +523,48 @@ public class PrettyPrintJasminVisitor implements IJasminVisitor<Void> {
     @Override
     public Void visit(JFloatCompare instruction) {
         println("fcmpg");
-
         return null;
     }
 
     @Override
-    public Void visit(JStringCompare instruction) {
-        println("invokevirtual java/lang/String/compareTo(Ljava/lang/String;)I");
+    public Void visit(JFloatSubtract instruction) {
+        println("fsub");
+        return null;
+    }
 
+    @Override
+    public Void visit(JFloatAdd instruction) {
+        println("fadd");
+        return null;
+    }
+
+    @Override
+    public Void visit(JFloatMultiply instruction) {
+        println("fmul");
         return null;
     }
 
     @Override
     public Void visit(JIntegerSubtract instruction) {
         println("isub");
+        return null;
+    }
 
+    @Override
+    public Void visit(JIntegerAdd instruction) {
+        println("iadd");
+        return null;
+    }
+
+    @Override
+    public Void visit(JIntegerMultiply instruction) {
+        println("imul");
+        return null;
+    }
+
+    @Override
+    public Void visit(JIntegerXor instruction) {
+        println("ixor");
         return null;
     }
 

@@ -20,7 +20,13 @@ public interface IJasminVisitor<T> {
 
     T visit(JStore instruction);
 
+    T visit(JDuplicateTopOfStack instruction);
+
     T visit(JIfZero instruction);
+
+    T visit(JIfLessThanZero instruction);
+
+    T visit(JIfGreaterThanZero instruction);
 
     T visit(JGoTo instruction);
 
@@ -28,7 +34,25 @@ public interface IJasminVisitor<T> {
 
     T visit(VoidReturn instruction);
 
+    T visit(JInvokeInstruction instruction);
+
     T visit(JLoadPrintStream instruction);
+
+    T visit(JStringBuilderNew instruction);
+
+    T visit(JStringBuilderInit instruction);
+
+    T visit(JStringBuilderAppend instruction);
+
+    T visit(JStringBuilderOutput instruction);
+
+    T visit(JStringCompare instruction);
+
+    T visit(JArrayNew instruction);
+
+    T visit(JArrayStore instruction);
+
+    T visit(JArrayLoad instruction);
 
     T visit(JPrint instruction);
 
@@ -48,8 +72,18 @@ public interface IJasminVisitor<T> {
 
     T visit(JFloatCompare instruction);
 
-    T visit(JStringCompare instruction);
+    T visit(JFloatSubtract instruction);
+
+    T visit(JFloatAdd instruction);
+
+    T visit(JFloatMultiply instruction);
 
     T visit(JIntegerSubtract instruction);
+
+    T visit(JIntegerAdd instruction);
+
+    T visit(JIntegerMultiply instruction);
+
+    T visit(JIntegerXor instruction);
 
 }

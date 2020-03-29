@@ -1,0 +1,32 @@
+void main() {
+    int x;
+    x = 1;
+
+    println x;
+    print x;
+    println "";
+
+    println "string";
+    print "string";
+    println "";
+
+    println 'c';
+    print 'c';
+    println "";
+
+    println 5.0;
+    print 5.0;
+    println "";
+
+    println 7;
+    print 7;
+    println "";
+
+    println true;
+    print true;
+    println "";
+
+    println false;
+    print false;
+    println "";
+}

@@ -1,0 +1,22 @@
+void main() {
+    int val;
+
+    if (true) {
+        println "print";
+    } else {
+        println "do not";
+    }
+
+    if (false) {
+        println "do not";
+    } else {
+        println "print";
+    }
+
+    val = 0;
+    while (val < 10) {
+        println val;
+        val = val + 1;
+    }
+
+}

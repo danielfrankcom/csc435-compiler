@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 public class JasminGenVisitor implements IIrVisitor<Void> {
 
@@ -82,7 +83,7 @@ public class JasminGenVisitor implements IIrVisitor<Void> {
         return convertType(type);
     }
 
-    private static JInstructionType getInstructionType(IrType type) {
+    private static JInstructionType convertInstructionType(IrType type) {
         final JInstructionType result;
 
         if (type instanceof IrType.Atomic) {
@@ -116,6 +117,7 @@ public class JasminGenVisitor implements IIrVisitor<Void> {
     private int mNextLabel = 0;
 
     private JProgram mProgram = null;
+    private String mProgramName = null;
 
     public JProgram getProgram() {
         return mProgram;
@@ -128,11 +130,13 @@ public class JasminGenVisitor implements IIrVisitor<Void> {
 
     @Override
     public Void visit(IrProgram program) {
+        mProgramName = program.getName();
+
         for (IrFunction function : program.getFunctions()) {
             function.accept(this);
         }
 
-        mProgram = new JProgram(program.getName(), mFunctions);
+        mProgram = new JProgram(mProgramName, mFunctions);
 
         return null;
     }
@@ -163,11 +167,6 @@ public class JasminGenVisitor implements IIrVisitor<Void> {
 
         final List<VarDirective> varDirectives = new LinkedList<>();
         for (IrTemp temp : function.getDeclarations()) {
-            if (temp.getCategory() == IrTemp.Category.PARAMETER) {
-                // Parameters are added by Jasmin.
-                continue;
-            }
-
             final int varNumber = temp.getNumber();
 
             final IrType irType = temp.getType();
@@ -181,6 +180,7 @@ public class JasminGenVisitor implements IIrVisitor<Void> {
         for (IInstruction irInstruction : function.getInstructions()) {
             irInstruction.accept(this);
         }
+
         mInstructionList.add(lastLabel);
 
         final LimitDirectives limitDirectives = new LimitDirectives(varDirectives.size(), STACK_SIZE_LIMIT);
@@ -218,26 +218,135 @@ public class JasminGenVisitor implements IIrVisitor<Void> {
 
     @Override
     public Void visit(Jump instruction) {
+        final int existingInstructions = mInstructionList.size();
+        if (existingInstructions > 0) {
+            final int lastInstructionIndex = existingInstructions - 1;
+            final JInstruction lastInstruction = mInstructionList.get(lastInstructionIndex);
+
+            // Placing a jump after a return statement
+            // results in invalid Jasmin code.
+            if (lastInstruction instanceof JReturn) {
+                return null;
+            }
+        }
+
+        final int labelNum = instruction.getJumpLabel().getLabelNum();
+        final String labelName = "L_ir_" + labelNum;
+        final JLabel label = new JLabel(labelName);
+
+        final JInstruction goToInstruction = new JGoTo(label);
+        mInstructionList.add(goToInstruction);
+
         return null;
     }
 
     @Override
     public Void visit(ConditionalJump jump) {
+        assert jump.getCondition().getType().equals(IrType.Atomic.Boolean);
+
+        final int varNumber = jump.getCondition().getNumber();
+        final JInstruction load = new JLoad(JInstructionType.Integer, varNumber);
+        mInstructionList.add(load);
+
+        final int labelNum = jump.getJumpLabel().getLabelNum();
+        final String labelName = "L_ir_" + labelNum;
+        final JLabel label = new JLabel(labelName);
+        final JInstruction conditionalJump = new JIfGreaterThanZero(label);
+        mInstructionList.add(conditionalJump);
+
         return null;
     }
 
     @Override
     public Void visit(IrInitializeArray initialization) {
+        final int size = initialization.getSize();
+        final JConstant sizeConstant = new IntegerConstant(size);
+        final JInstruction loadConstant = new JLoadConstant(sizeConstant);
+        mInstructionList.add(loadConstant);
+
+        final IrType irType = initialization.getType();
+        final JType.UniversalType elementType = convertType(irType);
+
+        final JInstruction newArray;
+        if (elementType.equals(JType.Universal.String)) {
+            newArray = new JArrayNew(JArrayType.Address, elementType);
+        } else {
+            newArray = new JArrayNew(JArrayType.Primitive, elementType);
+        }
+        mInstructionList.add(newArray);
+
+        final IrTemp result = initialization.getTemp();
+        final IrType resultType = result.getType();
+        final JInstructionType resultInstructionType = convertInstructionType(resultType);
+        final JInstruction store = new JStore(resultInstructionType, result.getNumber());
+        mInstructionList.add(store);
+
         return null;
     }
 
     @Override
     public Void visit(IrArrayAssignment assignment) {
+        final IrTemp arrayTemp = assignment.getArray();
+        final IrType arrayTempType = arrayTemp.getType();
+        final JInstructionType arrayLoadType = convertInstructionType(arrayTempType);
+        final JInstruction arrayLoad = new JLoad(arrayLoadType, arrayTemp.getNumber());
+        mInstructionList.add(arrayLoad);
+
+        final IrTemp indexTemp = assignment.getIndex();
+        final IrType indexTempType = indexTemp.getType();
+        final JInstructionType indexLoadType = convertInstructionType(indexTempType);
+        final JInstruction indexLoad = new JLoad(indexLoadType, indexTemp.getNumber());
+        mInstructionList.add(indexLoad);
+
+        final IrTemp valueTemp = assignment.getValue();
+        final IrType valueTempType = valueTemp.getType();
+        final JInstructionType valueLoadType = convertInstructionType(valueTempType);
+        final JInstruction valueLoad = new JLoad(valueLoadType, valueTemp.getNumber());
+        mInstructionList.add(valueLoad);
+
+        final JType.UniversalType elementType = convertType(assignment.getValue().getType());
+
+        final JInstruction arrayStore;
+        if (elementType.equals(JType.Universal.String)) {
+            arrayStore = new JArrayStore(JArrayType.Address);
+        } else {
+            arrayStore = new JArrayStore(JArrayType.Primitive);
+        }
+        mInstructionList.add(arrayStore);
+
         return null;
     }
 
     @Override
     public Void visit(IrArrayAccess access) {
+        final IrTemp arrayTemp = access.getArray();
+        final IrType arrayTempType = arrayTemp.getType();
+        final JInstructionType arrayLoadType = convertInstructionType(arrayTempType);
+        final JInstruction arrayLoad = new JLoad(arrayLoadType, arrayTemp.getNumber());
+        mInstructionList.add(arrayLoad);
+
+        final IrTemp indexTemp = access.getIndex();
+        final IrType indexTempType = indexTemp.getType();
+        final JInstructionType indexLoadType = convertInstructionType(indexTempType);
+        final JInstruction indexLoad = new JLoad(indexLoadType, indexTemp.getNumber());
+        mInstructionList.add(indexLoad);
+
+        final JType.UniversalType elementType = convertType(access.getResult().getType());
+
+        final JInstruction instruction;
+        if (elementType.equals(JType.Universal.String)) {
+            instruction = new JArrayLoad(JArrayType.Address);
+        } else {
+            instruction = new JArrayLoad(JArrayType.Primitive);
+        }
+        mInstructionList.add(instruction);
+
+        final IrTemp resultTemp = access.getResult();
+        final IrType resultTempType = resultTemp.getType();
+        final JInstructionType resultStoreType = convertInstructionType(resultTempType);
+        final JInstruction valueStore = new JStore(resultStoreType, resultTemp.getNumber());
+        mInstructionList.add(valueStore);
+
         return null;
     }
 
@@ -245,7 +354,7 @@ public class JasminGenVisitor implements IIrVisitor<Void> {
     public Void visit(ConstantAssignment assignment) {
         final IrTemp operand = assignment.getOperand();
         final IrType operandType = operand.getType();
-        final JInstructionType instructionType = getInstructionType(operandType);
+        final JInstructionType instructionType = convertInstructionType(operandType);
 
         final ConstantAssignment.Value value = assignment.getValue();
         final JConstant constant;
@@ -284,7 +393,7 @@ public class JasminGenVisitor implements IIrVisitor<Void> {
         final IrTemp right = assignment.getRight();
 
         final IrType operandType = right.getType();
-        final JInstructionType instructionType = getInstructionType(operandType);
+        final JInstructionType instructionType = convertInstructionType(operandType);
 
         final JInstruction rightLoad = new JLoad(instructionType, right.getNumber());
         mInstructionList.add(rightLoad);
@@ -299,7 +408,7 @@ public class JasminGenVisitor implements IIrVisitor<Void> {
     public Void visit(Print instruction) {
         final IrTemp operand = instruction.getOperand();
         final IrType operandType = operand.getType();
-        final JInstructionType instructionType = getInstructionType(operandType);
+        final JInstructionType instructionType = convertInstructionType(operandType);
 
         final JInstruction streamLoad = new JLoadPrintStream();
         mInstructionList.add(streamLoad);
@@ -319,7 +428,7 @@ public class JasminGenVisitor implements IIrVisitor<Void> {
     public Void visit(PrintLn instruction) {
         final IrTemp operand = instruction.getOperand();
         final IrType operandType = operand.getType();
-        final JInstructionType instructionType = getInstructionType(operandType);
+        final JInstructionType instructionType = convertInstructionType(operandType);
 
         final JInstruction streamLoad = new JLoadPrintStream();
         mInstructionList.add(streamLoad);
@@ -335,13 +444,48 @@ public class JasminGenVisitor implements IIrVisitor<Void> {
         return null;
     }
 
+    private void generateFunctionInvoke(IrCall instruction, IrType irReturnType, int resultVarNum) {
+        final List<IrTemp> params = instruction.getParams();
+        final List<JType.UniversalType> paramTypes = new ArrayList<>(params.size());
+
+        for (IrTemp param : params) {
+            final IrType originalType = param.getType();
+
+            final JInstructionType instructionType = convertInstructionType(originalType);
+            final JInstruction loadInstruction = new JLoad(instructionType, param.getNumber());
+            mInstructionList.add(loadInstruction);
+
+            final JType.UniversalType varType = convertType(param.getType());
+            paramTypes.add(varType);
+        }
+
+        final JType.ReturnType returnType = convertReturnType(irReturnType);
+        final JInstruction invoke = new JInvokeInstruction(mProgramName,
+                instruction.getFunctionName(), paramTypes, returnType);
+        mInstructionList.add(invoke);
+
+        if (returnType.equals(JType.Return.Void) == false) {
+            final JInstructionType returnInstructionType = convertInstructionType(irReturnType);
+            final JInstruction resultStore = new JStore(returnInstructionType, resultVarNum);
+            mInstructionList.add(resultStore);
+        }
+
+    }
+
     @Override
     public Void visit(IrCall instruction) {
+        final IrType returnType = IrType.Atomic.Void;
+        generateFunctionInvoke(instruction, returnType, -1);
+
         return null;
     }
 
     @Override
     public Void visit(IrCallWithResult instruction) {
+        final IrType returnType = instruction.getResult().getType();
+        final int resultVarNum = instruction.getResult().getNumber();
+        generateFunctionInvoke(instruction, returnType, resultVarNum);
+
         return null;
     }
 
@@ -355,7 +499,7 @@ public class JasminGenVisitor implements IIrVisitor<Void> {
 
         final IrTemp temp = value.get();
         final IrType returnType = temp.getType();
-        final JInstructionType instructionType = getInstructionType(returnType);
+        final JInstructionType instructionType = convertInstructionType(returnType);
 
         final int varNumber = temp.getNumber();
         final JInstruction loadInstruction = new JLoad(instructionType, varNumber);
@@ -367,21 +511,22 @@ public class JasminGenVisitor implements IIrVisitor<Void> {
         return null;
     }
 
-    @Override
-    public Void visit(IrEquality equality) {
-        final IrTemp left = equality.getLeft();
-        final IrType leftIrType = left.getType();
-        final JInstructionType operandType = getInstructionType(leftIrType);
-
-        final IrTemp result = equality.getResult();
+    private void generateBooleanOperation(BinaryOperation operation, Function<JLabel, JInstruction> comparisonFactory) {
+        final IrTemp result = operation.getResult();
         final IrType resultIrType = result.getType();
-        final JInstructionType resultType = getInstructionType(resultIrType);
+        final JInstructionType resultType = convertInstructionType(resultIrType);
 
-        final int leftVar = equality.getLeft().getNumber();
+        final IrTemp left = operation.getLeft();
+        final IrTemp right = operation.getRight();
+
+        final IrType leftIrType = left.getType();
+        final JInstructionType operandType = convertInstructionType(leftIrType);
+
+        final int leftVar = left.getNumber();
         final JInstruction loadLeft = new JLoad(operandType, leftVar);
         mInstructionList.add(loadLeft);
 
-        final int rightVar = equality.getRight().getNumber();
+        final int rightVar = right.getNumber();
         final JInstruction loadRight = new JLoad(operandType, rightVar);
         mInstructionList.add(loadRight);
 
@@ -407,7 +552,7 @@ public class JasminGenVisitor implements IIrVisitor<Void> {
         final JLabel zeroLabel = getNextLabel();
         final JLabel otherLabel = getNextLabel();
 
-        final JInstruction ifZero = new JIfZero(zeroLabel);
+        final JInstruction ifZero = comparisonFactory.apply(zeroLabel);
         mInstructionList.add(ifZero);
 
         final JInstruction loadFalse = new JLoadConstant(new BooleanConstant(false));
@@ -425,32 +570,163 @@ public class JasminGenVisitor implements IIrVisitor<Void> {
 
         final JInstruction resultStore = new JStore(resultType, result.getNumber());
         mInstructionList.add(resultStore);
+    }
+
+    @Override
+    public Void visit(IrEquality equality) {
+        generateBooleanOperation(equality, JIfZero::new);
 
         return null;
     }
 
     @Override
     public Void visit(IrLessThan lessThan) {
+        generateBooleanOperation(lessThan, JIfLessThanZero::new);
+
         return null;
     }
 
     @Override
     public Void visit(IrAdd add) {
+        final IrTemp result = add.getResult();
+        final IrType resultIrType = result.getType();
+        final JInstructionType resultType = convertInstructionType(resultIrType);
+
+        final int leftVar = add.getLeft().getNumber();
+        final JInstruction loadLeft = new JLoad(resultType, leftVar);
+        mInstructionList.add(loadLeft);
+
+        final int rightVar = add.getRight().getNumber();
+        final JInstruction loadRight = new JLoad(resultType, rightVar);
+        mInstructionList.add(loadRight);
+
+        switch (resultType) {
+            case Integer:
+                mInstructionList.add(new JIntegerAdd());
+                break;
+            case FloatingPoint:
+                mInstructionList.add(new JFloatAdd());
+                break;
+            case Address:
+                // Arrays are not supported for this operation, but
+                // these are already filtered by semantic checking.
+                mInstructionList.add(new JLoadPrintStream());
+
+                mInstructionList.add(new JStringBuilderNew());
+                mInstructionList.add(new JDuplicateTopOfStack());
+                mInstructionList.add(new JStringBuilderInit());
+
+                mInstructionList.add(new JLoad(resultType, leftVar));
+                mInstructionList.add(new JStringBuilderAppend());
+
+                mInstructionList.add(new JLoad(resultType, rightVar));
+                mInstructionList.add(new JStringBuilderAppend());
+
+                mInstructionList.add(new JStringBuilderOutput());
+                break;
+            default:
+                final String message = String.format("Invalid type %s provided.", resultType);
+                throw new IllegalArgumentException(message);
+        }
+
+        final JInstruction resultStore = new JStore(resultType, result.getNumber());
+        mInstructionList.add(resultStore);
+
         return null;
     }
 
     @Override
     public Void visit(IrSubtract subtract) {
+        final IrTemp result = subtract.getResult();
+        final IrType resultIrType = result.getType();
+        final JInstructionType resultType = convertInstructionType(resultIrType);
+
+        final int leftVar = subtract.getLeft().getNumber();
+        final JInstruction loadLeft = new JLoad(resultType, leftVar);
+        mInstructionList.add(loadLeft);
+
+        final int rightVar = subtract.getRight().getNumber();
+        final JInstruction loadRight = new JLoad(resultType, rightVar);
+        mInstructionList.add(loadRight);
+
+        final JInstruction operation;
+        switch (resultType) {
+            case Integer:
+                operation = new JIntegerSubtract();
+                break;
+            case FloatingPoint:
+                operation = new JFloatSubtract();
+                break;
+            default:
+                final String message = String.format("Invalid type %s provided.", resultType);
+                throw new IllegalArgumentException(message);
+        }
+        mInstructionList.add(operation);
+
+        final JInstruction resultStore = new JStore(resultType, result.getNumber());
+        mInstructionList.add(resultStore);
+
         return null;
     }
 
     @Override
     public Void visit(IrMultiply multiply) {
+        final IrTemp result = multiply.getResult();
+        final IrType resultIrType = result.getType();
+        final JInstructionType resultType = convertInstructionType(resultIrType);
+
+        final int leftVar = multiply.getLeft().getNumber();
+        final JInstruction loadLeft = new JLoad(resultType, leftVar);
+        mInstructionList.add(loadLeft);
+
+        final int rightVar = multiply.getRight().getNumber();
+        final JInstruction loadRight = new JLoad(resultType, rightVar);
+        mInstructionList.add(loadRight);
+
+        final JInstruction operation;
+        switch (resultType) {
+            case Integer:
+                operation = new JIntegerMultiply();
+                break;
+            case FloatingPoint:
+                operation = new JFloatMultiply();
+                break;
+            default:
+                final String message = String.format("Invalid type %s provided.", resultType);
+                throw new IllegalArgumentException(message);
+        }
+        mInstructionList.add(operation);
+
+        final JInstruction resultStore = new JStore(resultType, result.getNumber());
+        mInstructionList.add(resultStore);
+
         return null;
     }
 
     @Override
     public Void visit(IrInversion inversion) {
+
+        final IrTemp original = inversion.getOriginal();
+        final IrType originalIrType = original.getType();
+        final JInstructionType originalType = convertInstructionType(originalIrType);
+
+        final JInstruction load = new JLoad(originalType, original.getNumber());
+        mInstructionList.add(load);
+
+        final JConstant constantOne = new IntegerConstant(1);
+        final JInstruction loadOne = new JLoadConstant(constantOne);
+        mInstructionList.add(loadOne);
+
+        final JInstruction xor = new JIntegerXor();
+        mInstructionList.add(xor);
+
+        final IrTemp result = inversion.getResult();
+        final IrType resultIrType = result.getType();
+        final JInstructionType resultType = convertInstructionType(resultIrType);
+
+        final JInstruction store = new JStore(resultType, result.getNumber());
+        mInstructionList.add(store);
+
         return null;
     }
 

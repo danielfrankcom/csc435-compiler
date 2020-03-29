@@ -2,7 +2,7 @@ package ca.frankcom.csc435.compiler.jasmin;
 
 import ca.frankcom.csc435.compiler.jasmin.visit.IJasminVisitor;
 
-public class ValueReturn implements JInstruction {
+public class ValueReturn implements JReturn {
 
     public ValueReturn(JInstructionType type) {
         assert type != null;

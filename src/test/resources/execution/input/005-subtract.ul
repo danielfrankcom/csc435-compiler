@@ -1,0 +1,5 @@
+void main() {
+    println 1 - 4;
+    println 4.5 - 1.5;
+    println 'c' - '!' - '!';
+}

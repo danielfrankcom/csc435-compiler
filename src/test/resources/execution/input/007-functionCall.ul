@@ -1,0 +1,19 @@
+void main() {
+    println "start";
+    foo();
+    buzz();
+    println(bar(8, 8, "output"));
+}
+
+void foo() {
+    println "foo";
+}
+
+void buzz() {
+}
+
+int bar(int x, int y, string output) {
+    println x + y;
+    println output;
+    return 10;
+}

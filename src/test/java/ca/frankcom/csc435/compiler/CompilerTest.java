@@ -2,7 +2,6 @@ package ca.frankcom.csc435.compiler;
 
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.io.FileUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.*;
@@ -118,8 +117,8 @@ public class CompilerTest {
 
                 boolean success = false;
                 try {
-                    Compiler.compile("Test", inputStream, null, null,
-                            null, classDirPath, true);
+                    Compiler.compile("Test", inputStream, null, new FileOutputStream("/tmp/temp.ir"),
+                            new FileOutputStream("/tmp/temp.j"), classDirPath, true);
 
                     // The above line will not throw an exception if successful,
                     // but will also not return a result. We double check that
@@ -163,11 +162,10 @@ public class CompilerTest {
         process.waitFor();
     }
 
-    @Ignore
     @Test
     public void compileCodeGen() throws Exception {
         final String PREFIX = "/home/daniel/docs/csc435/compiler/src/test/resources/execution/input/";
-        final String INPUT = "001-helloWorld.ul";
+        final String INPUT = "015-factorial.ul";
 
         final InputStream inputStream = new FileInputStream(PREFIX + INPUT);
         final OutputStream irStream = new FileOutputStream("/tmp/output.ir");
@@ -176,7 +174,7 @@ public class CompilerTest {
 
         // This file is a black-box test tool provided by the instructor, so cannot
         // be pulled from external resources. The binary is stored in the repo.
-        final URL codeGenUrl = CLASS_LOADER.getResource("ir/codegen");
+        final URL codeGenUrl = CLASS_LOADER.getResource("codegen");
         final String codeGenExecutable = codeGenUrl.getPath();
 
         System.out.println(PREFIX + INPUT);

@@ -1,0 +1,39 @@
+void main() {
+    string[5] vals;
+    string[2] result;
+
+    vals[0] = "zero";
+    vals[4] = "four";
+
+    result = trim(vals);
+    println result[0];
+    println result[1];
+
+    foo();
+    baz();
+}
+
+string[2] trim(string[5] original) {
+    string[2] result;
+
+    result[0] = original[0];
+    result[1] = original[4];
+
+    return result;
+}
+
+void foo() {
+    int[2] vals;
+
+    vals[0] = 1;
+    vals[1] = 2;
+    println vals[0] + vals[1];
+}
+
+void baz() {
+    int[2] vals1;
+    float[2] vals2;
+    char[2] vals3;
+    string[2] vals4;
+    boolean[2] vals5;
+}
