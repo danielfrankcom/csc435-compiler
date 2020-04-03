@@ -162,26 +162,4 @@ public class CompilerTest {
         process.waitFor();
     }
 
-    @Test
-    public void compileCodeGen() throws Exception {
-        final String PREFIX = "/home/daniel/docs/csc435/compiler/src/test/resources/execution/input/";
-        final String INPUT = "015-factorial.ul";
-
-        final InputStream inputStream = new FileInputStream(PREFIX + INPUT);
-        final OutputStream irStream = new FileOutputStream("/tmp/output.ir");
-        Compiler.compile("test", inputStream, null, irStream,
-                null, null, true);
-
-        // This file is a black-box test tool provided by the instructor, so cannot
-        // be pulled from external resources. The binary is stored in the repo.
-        final URL codeGenUrl = CLASS_LOADER.getResource("codegen");
-        final String codeGenExecutable = codeGenUrl.getPath();
-
-        System.out.println(PREFIX + INPUT);
-        final String codeGenCommand = String.format("%s --file=%s", codeGenExecutable, "/tmp/output.ir");
-        System.out.println("Executing codegen.");
-        final Process codeGenProcess = Runtime.getRuntime().exec(codeGenCommand);
-        writeOutputTo(codeGenProcess, "/tmp/output.j");
-    }
-
 }
