@@ -1,4 +1,4 @@
-# CSC 435 Compiler
+# Toy Compiler
 
 ## Prerequisites
 
